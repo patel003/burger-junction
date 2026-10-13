@@ -1,0 +1,371 @@
+<div class="home-page">
+  <div class="home-container">
+
+    <!-- =========================
+         HERO + SEARCH
+    ========================== -->
+    <section class="hero">
+      <div class="hero-text">
+        <h1>
+          What are you craving
+          <span>today?</span>
+        </h1>
+
+        <p>Fresh burgers, wraps and sides delivered hot to your doorstep.</p>
+
+        <label class="search-box">
+          <span aria-hidden="true">🔍</span>
+          <input
+            type="search"
+            [value]="searchText"
+            (input)="onSearch($any($event.target).value)"
+            placeholder="Search for burgers, wraps, fries..."
+            aria-label="Search food"
+          />
+          @if (searchText) {
+            <button type="button" class="clear-btn" (click)="clearFilters()" aria-label="Clear search">✕</button>
+          }
+        </label>
+
+        <ul class="hero-chips">
+          <li>⚡ 30–40 min delivery</li>
+          <li>🥬 Fresh ingredients</li>
+          <li>💵 Cash or UPI</li>
+        </ul>
+      </div>
+
+      @if (heroImages.length > 0) {
+        <div class="hero-photos" aria-hidden="true">
+          @for (item of heroImages; track item.id) {
+            <img [src]="item.imageUrl" [alt]="item.name" (error)="$any($event.target).style.visibility = 'hidden'" />
+          }
+        </div>
+      }
+    </section>
+
+    <!-- =========================
+         OFFERS
+    ========================== -->
+    @if (coupons.length > 0 && !searchText.trim()) {
+      <section class="block">
+        <div class="block-head">
+          <h2>Offers for you 🎁</h2>
+          <a routerLink="/offers" class="link">View all →</a>
+        </div>
+
+        <div class="scroll-row">
+          @for (coupon of coupons; track coupon.id) {
+            <article class="offer-card">
+              <div class="offer-discount">
+                @if (coupon.discountType === "Percentage") {
+                  {{ coupon.discountValue }}% OFF
+                } @else {
+                  ₹{{ coupon.discountValue }} OFF
+                }
+              </div>
+
+              <p class="offer-desc">{{ coupon.description }}</p>
+
+              <p class="offer-meta">
+                @if (coupon.minimumOrderAmount > 0) {
+                  On orders above ₹{{ coupon.minimumOrderAmount }}
+                } @else {
+                  No minimum order
+                }
+                @if (coupon.maximumDiscountAmount) {
+                  · Save up to ₹{{ coupon.maximumDiscountAmount }}
+                }
+              </p>
+
+              <div class="offer-code">
+                <strong>{{ coupon.code }}</strong>
+                <button type="button" (click)="copyCode(coupon.code)">
+                  {{ copiedCode === coupon.code ? "Copied ✓" : "Copy" }}
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- =========================
+         WHAT'S ON YOUR MIND (categories)
+    ========================== -->
+    @if (categoriesWithProducts.length > 0 && !searchText.trim()) {
+      <section class="block">
+        <div class="block-head">
+          <h2>What's on your mind?</h2>
+          <div class="head-actions">
+            <a routerLink="/menu" class="link">Full menu →</a>
+            <span class="arrows">
+              <button type="button" class="arrow-btn" aria-label="Scroll left" (click)="circleRow.scrollBy({ left: -360, behavior: 'smooth' })">←</button>
+              <button type="button" class="arrow-btn" aria-label="Scroll right" (click)="circleRow.scrollBy({ left: 360, behavior: 'smooth' })">→</button>
+            </span>
+          </div>
+        </div>
+
+        <div #circleRow class="scroll-row circles">
+          <button
+            type="button"
+            class="circle-item"
+            [class.active]="selectedCategoryId === null"
+            (click)="clearFilters()"
+          >
+            <span class="circle"><span class="circle-emoji">🍽️</span></span>
+            <span class="circle-label">All</span>
+          </button>
+
+          @for (group of categoriesWithProducts; track group.category.id) {
+            <button
+              type="button"
+              class="circle-item"
+              [class.active]="selectedCategoryId === group.category.id"
+              (click)="selectCategory(group.category.id)"
+            >
+              <span class="circle">
+                <span class="circle-emoji">{{ getCategoryEmoji(group.category.name) }}</span>
+                @if (group.image) {
+                  <img
+                    [src]="group.image"
+                    alt=""
+                    (error)="$any($event.target).style.display = 'none'"
+                  />
+                }
+              </span>
+              <span class="circle-label">{{ group.category.name }}</span>
+            </button>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- =========================
+         PRODUCT LIST
+    ========================== -->
+    @if (loading) {
+
+      <div class="state-box">
+        <div class="spinner"></div>
+        <span>Loading delicious food...</span>
+      </div>
+
+    } @else if (products.length === 0) {
+
+      <div class="state-box">No products available right now.</div>
+
+    } @else if (isFiltering) {
+
+      <!-- SEARCH / CATEGORY RESULTS -->
+      <section class="block">
+        <div class="block-head">
+          <h2>
+            @if (searchText.trim()) {
+              Results for “{{ searchText }}”
+            } @else {
+              {{ selectedCategoryName }}
+            }
+            <small>({{ filteredProducts.length }})</small>
+          </h2>
+
+          <button type="button" class="link-btn" (click)="clearFilters()">Clear ✕</button>
+        </div>
+
+        @if (filteredProducts.length === 0) {
+          <div class="state-box">
+            <div class="state-icon">🔎</div>
+            <h3>No dishes found</h3>
+            <p>Try a different word or browse all categories.</p>
+            <button type="button" class="primary-btn" (click)="clearFilters()">Clear search</button>
+          </div>
+        } @else {
+          <div class="food-grid">
+            @for (product of filteredProducts; track product.id) {
+              <ng-container *ngTemplateOutlet="productCard; context: { $implicit: product }" />
+            }
+          </div>
+        }
+      </section>
+
+    } @else {
+
+      <!-- TOP PICKS -->
+      <section class="block">
+        <div class="block-head">
+          <h2>Top picks for you 🔥</h2>
+          <a routerLink="/menu" class="link">See all →</a>
+        </div>
+
+        <div class="food-grid">
+          @for (product of topPicks; track product.id) {
+            <ng-container *ngTemplateOutlet="productCard; context: { $implicit: product }" />
+          }
+        </div>
+      </section>
+
+      <!-- FAVOURITES -->
+      @if (favouriteProducts.length > 0) {
+        <section class="block">
+          <div class="block-head">
+            <h2>Your favourites ♥</h2>
+          </div>
+
+          <div class="scroll-row cards">
+            @for (product of favouriteProducts; track product.id) {
+              <div class="row-card">
+                <ng-container *ngTemplateOutlet="productCard; context: { $implicit: product }" />
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- CATEGORY ROWS -->
+      @for (group of categoriesWithProducts; track group.category.id) {
+        <section class="block">
+          <div class="block-head">
+            <h2>{{ group.category.name }}</h2>
+            <div class="head-actions">
+              <button type="button" class="link-btn" (click)="selectCategory(group.category.id)">
+                See all {{ group.items.length }} →
+              </button>
+              <span class="arrows">
+              <button type="button" class="arrow-btn" aria-label="Scroll left" (click)="catRow.scrollBy({ left: -360, behavior: 'smooth' })">←</button>
+              <button type="button" class="arrow-btn" aria-label="Scroll right" (click)="catRow.scrollBy({ left: 360, behavior: 'smooth' })">→</button>
+            </span>
+            </div>
+          </div>
+
+          <div #catRow class="scroll-row cards">
+            @for (product of group.items.slice(0, 6); track product.id) {
+              <div class="row-card">
+                <ng-container *ngTemplateOutlet="productCard; context: { $implicit: product }" />
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+    }
+
+    <!-- =========================
+         WHY US (ek patti)
+    ========================== -->
+    <section class="why-strip">
+      <div class="why-item">
+        <span class="why-icon">⚡</span>
+        <div>
+          <strong>Fast delivery</strong>
+          <small>Hot food in about 30–40 minutes</small>
+        </div>
+      </div>
+
+      <div class="why-item">
+        <span class="why-icon">🥬</span>
+        <div>
+          <strong>Fresh ingredients</strong>
+          <small>Prepared fresh for every order</small>
+        </div>
+      </div>
+
+      <div class="why-item">
+        <span class="why-icon">🔒</span>
+        <div>
+          <strong>Secure payment</strong>
+          <small>Cash on delivery or UPI</small>
+        </div>
+      </div>
+
+      <div class="why-item">
+        <span class="why-icon">❤️</span>
+        <div>
+          <strong>Made with care</strong>
+          <small>Every meal worth coming back for</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================
+         MOBILE CART BAR
+    ========================== -->
+    @if (cartCount > 0) {
+      <button type="button" class="mobile-cart-bar" (click)="goToCart()">
+        <span>🛒 {{ cartCount }} {{ cartCount === 1 ? "item" : "items" }} in your cart</span>
+        <strong>View cart →</strong>
+      </button>
+    }
+
+  </div>
+</div>
+
+<!-- =========================
+     PRODUCT CARD (ek hi jagah, sab sections use karte hain)
+========================== -->
+<ng-template #productCard let-product>
+  <article class="food-card" [class.is-unavailable]="isOutOfStock(product)">
+
+    <div class="food-image">
+      <div class="food-placeholder">
+        {{ getCategoryEmoji(getCategoryName(product.categoryId)) }}
+      </div>
+
+      @if (product.imageUrl) {
+        <img
+          [src]="product.imageUrl"
+          [alt]="product.name"
+          loading="lazy"
+          (error)="$any($event.target).style.display = 'none'"
+        />
+      }
+
+      @if (isOutOfStock(product)) {
+        <span class="availability-badge">Unavailable</span>
+      }
+
+      <button
+        type="button"
+        class="favorite-btn"
+        [class.active]="isFavourite(product.id)"
+        [attr.aria-pressed]="isFavourite(product.id)"
+        aria-label="Add to favourites"
+        (click)="toggleFavourite(product)"
+      >
+        {{ isFavourite(product.id) ? "♥" : "♡" }}
+      </button>
+    </div>
+
+    <div class="food-content">
+      <span class="food-category">{{ getCategoryName(product.categoryId) }}</span>
+
+      <h3>{{ product.name }}</h3>
+
+      <p>{{ product.description }}</p>
+
+      <div class="food-meta">⚡ 30–40 min</div>
+
+      <div class="food-footer">
+        <strong class="price">₹{{ product.price }}</strong>
+
+        @if (isOutOfStock(product)) {
+          <button type="button" class="add-btn" disabled>Unavailable</button>
+        } @else if (cartQuantity(product.id) > 0) {
+          <div class="stepper">
+            <button type="button" aria-label="Decrease quantity" (click)="decreaseFromCart(product)">−</button>
+            <span>{{ cartQuantity(product.id) }}</span>
+            <button
+              type="button"
+              aria-label="Increase quantity"
+              [disabled]="cartQuantity(product.id) >= product.stockQuantity"
+              (click)="addToCart(product)"
+            >
+              +
+            </button>
+          </div>
+        } @else {
+          <button type="button" class="add-btn" (click)="addToCart(product)">ADD</button>
+        }
+      </div>
+    </div>
+
+  </article>
+</ng-template>

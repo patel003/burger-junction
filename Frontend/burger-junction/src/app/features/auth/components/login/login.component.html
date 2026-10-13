@@ -1,0 +1,103 @@
+<div class="login-page">
+
+  <div class="login-card">
+
+    <!-- Brand -->
+    <div class="brand">
+      <div class="brand-icon">🍔</div>
+      <h1>Burger Junction</h1>
+      <p>Fresh burgers. Fast delivery.</p>
+    </div>
+
+    <!-- Heading -->
+    <div class="form-heading">
+      <h2>Welcome Back!</h2>
+      <p>Login to continue ordering your favourites.</p>
+    </div>
+
+    <!-- Error -->
+    @if (errorMessage) {
+      <div class="error-message" role="alert">
+        <span>⚠</span>
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Login Form -->
+    <form (ngSubmit)="onLogin()">
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+
+        <input
+          id="email"
+          type="email"
+          name="email"
+          [(ngModel)]="email"
+          [class.invalid]="emailError"
+          placeholder="Enter your email"
+          autocomplete="email"
+        />
+
+        @if (emailError) {
+          <p class="field-error">{{ emailError }}</p>
+        }
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Password</label>
+
+        <div class="input-wrap">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            name="password"
+            [(ngModel)]="password"
+            [class.invalid]="passwordError"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+          />
+
+          <button
+            type="button"
+            class="toggle-pw"
+            (click)="showPassword = !showPassword"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+          >
+            {{ showPassword ? "Hide" : "Show" }}
+          </button>
+        </div>
+
+        @if (passwordError) {
+          <p class="field-error">{{ passwordError }}</p>
+        }
+
+        <a routerLink="/forgot-password" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <!-- Login Button -->
+      <button type="submit" class="login-btn" [disabled]="loading">
+        @if (loading) {
+          <span class="spinner"></span>
+          Logging in...
+        } @else {
+          Login
+        }
+      </button>
+
+    </form>
+
+    <!-- Register -->
+    <div class="register-link">
+      <span>Don't have an account?</span>
+      <a routerLink="/register">Create Account</a>
+    </div>
+
+    <!-- Back -->
+    <a routerLink="/" class="back-home">← Back to menu</a>
+
+  </div>
+
+</div>

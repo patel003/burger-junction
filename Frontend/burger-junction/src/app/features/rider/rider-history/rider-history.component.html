@@ -1,0 +1,295 @@
+<div class="history-page">
+
+  <!-- ========================= -->
+  <!-- PAGE HEADER -->
+  <!-- ========================= -->
+
+  <div class="page-header">
+
+    <div>
+      <span class="eyebrow">
+        RIDER PANEL
+      </span>
+
+      <h1>
+        Delivery History
+      </h1>
+
+      <p>
+        Your completed deliveries, cash collection and earnings.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- ========================= -->
+  <!-- LOADING -->
+  <!-- ========================= -->
+
+  @if (loading) {
+
+    <div class="state-card">
+
+      <div class="spinner"></div>
+
+      <p>
+        Loading history...
+      </p>
+
+    </div>
+
+  }
+
+  <!-- ========================= -->
+  <!-- ERROR -->
+  <!-- ========================= -->
+
+  @if (!loading && errorMessage) {
+
+    <div class="state-card error">
+
+      <strong>
+        Unable to load history
+      </strong>
+
+      <p>
+        {{ errorMessage }}
+      </p>
+
+      <button
+        type="button"
+        (click)="loadHistory()"
+      >
+        Try Again
+      </button>
+
+    </div>
+
+  }
+
+  <!-- ========================= -->
+  <!-- CONTENT -->
+  <!-- ========================= -->
+
+  @if (!loading && !errorMessage) {
+
+    <!-- ========================= -->
+    <!-- SUMMARY -->
+    <!-- ========================= -->
+
+    <div class="summary-grid">
+
+      <!-- COMPLETED -->
+      <div class="summary-card">
+
+        <span>
+          Completed Deliveries
+        </span>
+
+        <strong>
+          {{ totalDeliveries }}
+        </strong>
+
+      </div>
+
+      <!-- CASH -->
+      <div class="summary-card">
+
+        <span>
+          Cash Collected
+        </span>
+
+        <strong>
+          ₹{{ totalCashCollected }}
+        </strong>
+
+      </div>
+
+      <!-- EARNINGS -->
+      <div class="summary-card earnings-card">
+
+        <span>
+          Total Earnings
+        </span>
+
+        <strong>
+          ₹{{ totalEarnings }}
+        </strong>
+
+      </div>
+
+    </div>
+
+    <!-- ========================= -->
+    <!-- EMPTY -->
+    <!-- ========================= -->
+
+    @if (orders.length === 0) {
+
+      <div class="state-card">
+
+        <div class="empty-icon">
+          📦
+        </div>
+
+        <h2>
+          No delivery history
+        </h2>
+
+        <p>
+          Completed deliveries will appear here.
+        </p>
+
+      </div>
+
+    }
+
+    <!-- ========================= -->
+    <!-- HISTORY LIST -->
+    <!-- ========================= -->
+
+    @else {
+
+      <div class="history-list">
+
+        @for (
+          order of orders;
+          track order.id
+        ) {
+
+          <article class="history-card">
+
+            <!-- HEADER -->
+
+            <div class="history-header">
+
+              <div>
+
+                <span class="order-number">
+                  Order #{{ order.id }}
+                </span>
+
+                <h2>
+                  {{ order.customerName }}
+                </h2>
+
+              </div>
+
+              <span class="delivered-badge">
+                Delivered
+              </span>
+
+            </div>
+
+            <!-- INFO -->
+
+            <div class="history-info">
+
+              <!-- ADDRESS -->
+
+              <div>
+
+                <span>
+                  Delivered to
+                </span>
+
+                <strong>
+                  {{ order.deliveryAddress }}
+                </strong>
+
+              </div>
+
+              <!-- PAYMENT -->
+
+              <div>
+
+                <span>
+                  Payment
+                </span>
+
+                <strong>
+                  {{ order.paymentMethod || "Online Payment" }}
+                </strong>
+
+              </div>
+
+              <!-- PAYMENT STATUS -->
+
+              <div>
+
+                <span>
+                  Payment Status
+                </span>
+
+                <strong
+                  class="payment-paid"
+                >
+                  {{ order.paymentStatus || "Paid" }}
+                </strong>
+
+              </div>
+
+              <!-- ORDER AMOUNT -->
+
+              <div>
+
+                <span>
+                  Order Amount
+                </span>
+
+                <strong>
+                  ₹{{ order.totalAmount }}
+                </strong>
+
+              </div>
+
+              <!-- CASH COLLECTED -->
+
+              @if (
+                order.paymentMethod.toLowerCase() ===
+                  "cash on delivery" &&
+                order.paymentStatus.toLowerCase() ===
+                  "paid"
+              ) {
+
+                <div class="cash-collected-row">
+
+                  <span>
+                    Cash Collected
+                  </span>
+
+                  <strong>
+                    ₹{{ order.totalAmount }}
+                  </strong>
+
+                </div>
+
+              }
+
+              <!-- RIDER EARNING -->
+
+              <div class="rider-earning-row">
+
+                <span>
+                  Rider Earning
+                </span>
+
+                <strong>
+                  ₹{{ order.riderEarning }}
+                </strong>
+
+              </div>
+
+            </div>
+
+          </article>
+
+        }
+
+      </div>
+
+    }
+
+  }
+
+</div>

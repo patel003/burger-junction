@@ -1,0 +1,231 @@
+<div class="tracking-page">
+  <header class="tracking-header">
+    <div>
+      <span class="brand">BURGER JUNCTION</span>
+      <h1>Live Order Tracking</h1>
+      <p>Apne delivery rider ko live map par track karein.</p>
+    </div>
+
+    <span class="live-badge" [class.offline]="!connected">
+      <span class="live-dot"></span>
+      {{ connected ? 'Live Connected' : connecting ? 'Connecting...' : 'Offline' }}
+    </span>
+  </header>
+
+  <section class="tracking-card">
+    <div class="order-heading">
+      <div>
+        <span class="muted">Your Order</span>
+        <h2>Order #{{ orderId }}</h2>
+      </div>
+
+      <span class="status-badge">
+        {{ order?.status || (loadingOrder ? 'Loading...' : 'Unknown') }}
+      </span>
+    </div>
+
+    <!-- Order progress -->
+    <div class="stepper" *ngIf="order && !isCancelled" aria-label="Order progress">
+      <div
+        class="step"
+        *ngFor="let label of steps; let i = index"
+        [ngClass]="stepState(i)">
+        <span class="step-dot">{{ stepState(i) === 'done' ? '✓' : i + 1 }}</span>
+        <span class="step-label">{{ label }}</span>
+      </div>
+    </div>
+
+    <div *ngIf="isCancelled" class="error-message" role="alert">
+      Ye order cancel ho gaya hai.
+    </div>
+
+    <div *ngIf="loadingOrder" class="message-box">
+      Order details load ho rahi hain...
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message" role="alert">
+      {{ errorMessage }}
+    </div>
+
+    <ng-container *ngIf="order">
+      <div class="delivery-details">
+        <div class="detail-item">
+          <span class="muted">Customer</span>
+          <strong>{{ order.customerName }}</strong>
+        </div>
+
+        <div class="detail-item">
+          <span class="muted">Delivery Address</span>
+          <strong>{{ order.deliveryAddress }}</strong>
+        </div>
+
+        <div class="detail-item" *ngIf="order.riderName">
+          <span class="muted">Delivery Rider</span>
+          <strong>{{ order.riderName }}</strong>
+          <span *ngIf="order.riderPhone" class="muted">
+            {{ order.riderPhone }}
+          </span>
+          <a
+            *ngIf="order.riderPhone && !isDelivered"
+            class="call-btn"
+            [href]="'tel:' + order.riderPhone">
+            📞 Rider ko call karein
+          </a>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- Delivery OTP: sirf "Out for Delivery" par dikhta hai -->
+    <div class="otp-card" *ngIf="isOutForDelivery">
+      <span class="muted">Delivery OTP</span>
+
+      <ng-container *ngIf="deliveryOtp; else otpWaiting">
+        <div class="otp-code">
+          {{ deliveryOtp }}
+        </div>
+        <p class="muted otp-note">
+          Ye OTP sirf tab rider ko batayein jab order aapke haath mein aa jaye.
+          Kisi aur ke saath share na karein.
+        </p>
+      </ng-container>
+
+      <ng-template #otpWaiting>
+        <p class="otp-waiting">
+          Rider jab aapke paas pahunchega tab yahan OTP dikhega.
+          Agar OTP nahi dikh raha, rider se naya OTP generate karne ko kahein.
+        </p>
+      </ng-template>
+    </div>
+
+    <div class="destination-message" *ngIf="destinationMessage">
+      <span>{{ loadingDestination ? '⏳' : '📍' }}</span>
+      <span>{{ destinationMessage }}</span>
+    </div>
+
+    <div class="map-heading">
+      <div>
+        <h3>Delivery Map</h3>
+        <p class="muted">
+          Red scooter rider hai aur home marker aapka delivery destination hai.
+        </p>
+      </div>
+
+      <span class="live-map-indicator">
+        <span class="live-dot"></span>
+        {{ connected ? 'SignalR Connected' : 'Waiting for connection' }}
+      </span>
+    </div>
+
+    <div
+      id="rider-live-map"
+      class="rider-live-map"
+      role="application"
+      aria-label="Live rider and customer delivery map">
+    </div>
+
+    <div class="legend">
+      <span><span class="legend-dot rider-dot"></span> Rider location</span>
+      <span><span class="legend-dot customer-dot"></span> Customer destination</span>
+      <span><span class="legend-line"></span> Driving route</span>
+    </div>
+
+    <!-- Rider location freshness -->
+    <div
+      class="last-update"
+      *ngIf="location && !isDelivered && !isCancelled"
+      [class.stale]="isStale">
+      <span class="live-dot"></span>
+      <span>
+        Rider location: {{ lastUpdatedText }}
+        <ng-container *ngIf="isStale">
+          — rider ka GPS signal weak ho sakta hai
+        </ng-container>
+      </span>
+    </div>
+
+    <div class="route-message" *ngIf="routeMessage">
+      {{ routeMessage }}
+    </div>
+
+    <div
+      class="route-stats"
+      *ngIf="(distanceKm !== null || etaMinutes !== null) && isOutForDelivery">
+      <div class="stat-card">
+        <span class="stat-icon">🛣️</span>
+        <div>
+          <span class="muted">Road Distance</span>
+          <strong>
+            {{ distanceKm !== null ? (distanceKm | number:'1.1-1') + ' km' : 'Calculating...' }}
+          </strong>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <span class="stat-icon">⏱️</span>
+        <div>
+          <span class="muted">Approx. Travel Time</span>
+          <strong>
+            {{ etaMinutes !== null ? etaMinutes + ' min' : 'Calculating...' }}
+          </strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- State based messages -->
+    <div *ngIf="isDelivered" class="waiting-message">
+      <div class="waiting-icon">🎉</div>
+      <h3>Order deliver ho gaya</h3>
+      <p>Burger Junction se order karne ke liye shukriya.</p>
+      <p *ngIf="redirecting" class="muted">
+        Kuch second mein aapko My Orders par le jaya jayega...
+      </p>
+    </div>
+
+    <div
+      *ngIf="order && !location && !isDelivered && !isCancelled && !isOutForDelivery"
+      class="waiting-message">
+      <div class="waiting-icon">👨‍🍳</div>
+      <h3>Aapka order tayyar ho raha hai</h3>
+      <p>Rider ke pickup karte hi live tracking yahin shuru ho jayegi.</p>
+    </div>
+
+    <div
+      *ngIf="order && !location && isOutForDelivery"
+      class="waiting-message">
+      <div class="waiting-icon">🛵</div>
+      <h3>Rider ki location ka intezar hai</h3>
+      <p>
+        Rider nikal chuka hai. Uski live location kuch seconds me map par dikhne lagegi.
+      </p>
+    </div>
+
+    <div class="map-actions">
+      <button type="button" class="map-button secondary-button" (click)="recenter()">
+        🎯 Map recenter karein
+      </button>
+
+      <a
+        *ngIf="mapUrl && isOutForDelivery"
+        class="map-button"
+        [href]="mapUrl"
+        target="_blank"
+        rel="noopener noreferrer">
+        🛵 Open Rider Location
+      </a>
+
+      <a
+        *ngIf="destinationMapUrl"
+        class="map-button secondary-button"
+        [href]="destinationMapUrl"
+        target="_blank"
+        rel="noopener noreferrer">
+        🏠 Open Customer Destination
+      </a>
+    </div>
+
+    <p class="disclaimer">
+      Distance aur travel time external routing service ka estimate hain.
+      Actual delivery time traffic aur road conditions ke hisaab se badal sakta hai.
+    </p>
+  </section>
+</div>

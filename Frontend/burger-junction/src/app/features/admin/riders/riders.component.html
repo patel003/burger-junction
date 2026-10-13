@@ -1,0 +1,612 @@
+<div class="riders-page">
+
+  <!-- ========================= -->
+  <!-- PAGE HEADER -->
+  <!-- ========================= -->
+
+  <div class="page-header">
+
+    <div>
+      <p class="eyebrow">ADMIN PANEL</p>
+
+      <h1>Riders</h1>
+
+      <p class="subtitle">
+        Manage delivery riders, availability and earnings.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="primary-btn"
+      (click)="openCreateModal()"
+    >
+      + Add Rider
+    </button>
+
+  </div>
+
+  <!-- ========================= -->
+  <!-- SUCCESS MESSAGE -->
+  <!-- ========================= -->
+
+  <div
+    *ngIf="successMessage"
+    class="message success"
+  >
+    {{ successMessage }}
+  </div>
+
+  <!-- ========================= -->
+  <!-- ERROR MESSAGE -->
+  <!-- ========================= -->
+
+  <div
+    *ngIf="errorMessage"
+    class="message error"
+  >
+    {{ errorMessage }}
+  </div>
+
+  <!-- ========================= -->
+  <!-- TOOLBAR -->
+  <!-- ========================= -->
+
+  <div class="toolbar">
+
+    <input
+      type="text"
+      [(ngModel)]="searchText"
+      placeholder="Search rider, phone, email or vehicle..."
+    />
+
+    <button
+      type="button"
+      class="refresh-btn"
+      (click)="loadRiders()"
+      [disabled]="loading"
+    >
+      ↻ Refresh
+    </button>
+
+  </div>
+
+  <!-- ========================= -->
+  <!-- LOADING -->
+  <!-- ========================= -->
+
+  <div
+    *ngIf="loading"
+    class="loading-state"
+  >
+    Loading riders...
+  </div>
+
+  <!-- ========================= -->
+  <!-- EMPTY -->
+  <!-- ========================= -->
+
+  <div
+    *ngIf="!loading && filteredRiders.length === 0"
+    class="empty-state"
+  >
+    <div class="empty-icon">🚴</div>
+
+    <h3>No riders found</h3>
+
+    <p>
+      Create your first rider to start managing deliveries.
+    </p>
+  </div>
+
+  <!-- ========================= -->
+  <!-- RIDERS TABLE -->
+  <!-- ========================= -->
+
+  <div
+    *ngIf="!loading && filteredRiders.length > 0"
+    class="table-card"
+  >
+
+    <div class="table-wrapper">
+
+      <table>
+
+        <thead>
+
+          <tr>
+
+            <th>Rider</th>
+
+            <th>Phone</th>
+
+            <th>Vehicle</th>
+
+            <th>Earning / Delivery</th>
+
+            <th>Availability</th>
+
+            <th>Status</th>
+
+            <th>Action</th>
+
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <tr
+            *ngFor="let rider of filteredRiders"
+          >
+
+            <!-- RIDER -->
+            <td>
+
+              <div class="rider-info">
+
+                <div class="avatar">
+                  {{ rider.name.charAt(0).toUpperCase() }}
+                </div>
+
+                <div>
+
+                  <strong>
+                    {{ rider.name }}
+                  </strong>
+
+                  <span>
+                    {{ rider.email }}
+                  </span>
+
+                </div>
+
+              </div>
+
+            </td>
+
+            <!-- PHONE -->
+            <td>
+              {{ rider.phoneNumber }}
+            </td>
+
+            <!-- VEHICLE -->
+            <td>
+
+              <span class="vehicle">
+                {{ rider.vehicleNumber || "Not added" }}
+              </span>
+
+            </td>
+
+            <!-- EARNING -->
+            <td>
+
+              <div class="earning-cell">
+
+                <strong class="earning-amount">
+                  ₹{{ rider.earningPerDelivery}}
+                </strong>
+
+                <button
+                  type="button"
+                  class="edit-earning-btn"
+                  (click)="openEarningModal(rider)"
+                >
+                  Edit
+                </button>
+
+              </div>
+
+            </td>
+
+            <!-- AVAILABILITY -->
+            <td>
+
+              <span
+                class="online-badge"
+                [class.online]="rider.isOnline"
+              >
+
+                <span class="dot"></span>
+
+                {{ rider.isOnline ? "Online" : "Offline" }}
+
+              </span>
+
+            </td>
+
+            <!-- STATUS -->
+            <td>
+
+              <span
+                class="status-badge"
+                [class.active]="rider.isActive"
+                [class.inactive]="!rider.isActive"
+              >
+
+                {{
+                  rider.isActive
+                    ? "Active"
+                    : "Inactive"
+                }}
+
+              </span>
+
+            </td>
+
+            <!-- ACTION -->
+            <td>
+
+              <button
+                type="button"
+                class="status-btn"
+                [class.activate]="!rider.isActive"
+                [class.deactivate]="rider.isActive"
+                (click)="toggleStatus(rider)"
+              >
+
+                {{
+                  rider.isActive
+                    ? "Deactivate"
+                    : "Activate"
+                }}
+
+              </button>
+
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- CREATE RIDER MODAL -->
+<!-- ================================================= -->
+
+<div
+  *ngIf="showRiderModal"
+  class="modal-backdrop"
+  (click)="closeCreateModal()"
+>
+
+  <div
+    class="modal"
+    (click)="$event.stopPropagation()"
+  >
+
+    <!-- HEADER -->
+
+    <div class="modal-header">
+
+      <div>
+
+        <p class="eyebrow">
+          DELIVERY TEAM
+        </p>
+
+        <h2>
+          Create Rider
+        </h2>
+
+      </div>
+
+      <button
+        type="button"
+        class="close-btn"
+        (click)="closeCreateModal()"
+        [disabled]="saving"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <!-- BODY -->
+
+    <div class="modal-body">
+
+      <!-- NAME -->
+
+      <div class="form-group">
+
+        <label>
+          Full Name *
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="fullName"
+          placeholder="Enter rider name"
+          [disabled]="saving"
+        />
+
+      </div>
+
+      <!-- EMAIL + PHONE -->
+
+      <div class="form-row">
+
+        <div class="form-group">
+
+          <label>
+            Email *
+          </label>
+
+          <input
+            type="email"
+            [(ngModel)]="email"
+            placeholder="rider@example.com"
+            [disabled]="saving"
+          />
+
+        </div>
+
+        <div class="form-group">
+
+          <label>
+            Phone *
+          </label>
+
+          <input
+            type="tel"
+            [(ngModel)]="phoneNumber"
+            placeholder="9876543210"
+            [disabled]="saving"
+          />
+
+        </div>
+
+      </div>
+
+      <!-- PASSWORD + VEHICLE -->
+
+      <div class="form-row">
+
+        <div class="form-group">
+
+          <label>
+            Password *
+          </label>
+
+          <input
+            type="password"
+            [(ngModel)]="password"
+            placeholder="Minimum 6 characters"
+            [disabled]="saving"
+          />
+
+        </div>
+
+        <div class="form-group">
+
+          <label>
+            Vehicle Number
+          </label>
+
+          <input
+            type="text"
+            [(ngModel)]="vehicleNumber"
+            placeholder="UP16AB1234"
+            [disabled]="saving"
+          />
+
+        </div>
+
+      </div>
+
+      <!-- EARNING -->
+
+      <div class="form-group">
+
+        <label>
+          Earning Per Delivery (₹) *
+        </label>
+
+        <div class="earning-input-wrapper">
+
+          <span class="rupee-prefix">
+            ₹
+          </span>
+
+          <input
+            type="number"
+            [(ngModel)]="earningPerDelivery"
+            min="0"
+            step="1"
+            placeholder="35"
+            [disabled]="saving"
+          />
+
+        </div>
+
+        <small class="field-help">
+          This amount will be earned by the rider for each
+          successfully delivered order.
+        </small>
+
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+
+    <div class="modal-footer">
+
+      <button
+        type="button"
+        class="cancel-btn"
+        (click)="closeCreateModal()"
+        [disabled]="saving"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="primary-btn"
+        (click)="createRider()"
+        [disabled]="saving"
+      >
+
+        {{
+          saving
+            ? "Creating..."
+            : "Create Rider"
+        }}
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ================================================= -->
+<!-- EDIT EARNING MODAL -->
+<!-- ================================================= -->
+
+<div
+  *ngIf="showEarningModal"
+  class="modal-backdrop"
+  (click)="closeEarningModal()"
+>
+
+  <div
+    class="modal earning-modal"
+    (click)="$event.stopPropagation()"
+  >
+
+    <!-- HEADER -->
+
+    <div class="modal-header">
+
+      <div>
+
+        <p class="eyebrow">
+          RIDER EARNINGS
+        </p>
+
+        <h2>
+          Update Earning
+        </h2>
+
+      </div>
+
+      <button
+        type="button"
+        class="close-btn"
+        (click)="closeEarningModal()"
+        [disabled]="earningSaving"
+      >
+        ×
+      </button>
+
+    </div>
+
+    <!-- BODY -->
+
+    <div class="modal-body">
+
+      <div class="selected-rider-card">
+
+        <div class="avatar large">
+          {{
+            selectedRider?.name?.charAt(0)?.toUpperCase()
+          }}
+        </div>
+
+        <div>
+
+          <strong>
+            {{ selectedRider?.name }}
+          </strong>
+
+          <span>
+            {{ selectedRider?.phoneNumber }}
+          </span>
+
+        </div>
+
+      </div>
+
+      <div class="form-group">
+
+        <label>
+          Earning Per Delivery (₹)
+        </label>
+
+        <div class="earning-input-wrapper">
+
+          <span class="rupee-prefix">
+            ₹
+          </span>
+
+          <input
+            type="number"
+            [(ngModel)]="editEarningPerDelivery"
+            min="0"
+            step="1"
+            [disabled]="earningSaving"
+          />
+
+        </div>
+
+        <small class="field-help">
+          Example: Rahul ₹35, Amit ₹40.
+        </small>
+
+      </div>
+
+      <div class="earning-note">
+        💡 Changing this rate will apply to future
+        deliveries. Previous delivered orders keep
+        their original earning.
+      </div>
+
+    </div>
+
+    <!-- FOOTER -->
+
+    <div class="modal-footer">
+
+      <button
+        type="button"
+        class="cancel-btn"
+        (click)="closeEarningModal()"
+        [disabled]="earningSaving"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="primary-btn"
+        (click)="updateEarningRate()"
+        [disabled]="earningSaving"
+      >
+
+        {{
+          earningSaving
+            ? "Saving..."
+            : "Save Earning"
+        }}
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>

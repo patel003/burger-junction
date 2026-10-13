@@ -1,0 +1,160 @@
+<div class="register-page">
+  <div class="register-card">
+
+    <!-- Brand -->
+    <div class="brand">
+      <div class="brand-icon">🍔</div>
+      <h1>Burger Junction</h1>
+      <p>Fresh burgers. Fast delivery.</p>
+    </div>
+
+    <!-- Heading -->
+    <div class="form-heading">
+      <h2>Create Account</h2>
+      <p>Join Burger Junction and start ordering your favourites.</p>
+    </div>
+
+    <!-- Error -->
+    @if (errorMessage) {
+      <div class="error-message" role="alert">
+        <span>⚠</span>
+        {{ errorMessage }}
+      </div>
+    }
+
+    <!-- Register Form -->
+    <form (ngSubmit)="onRegister()">
+
+      <!-- Full Name -->
+      <div class="form-group">
+        <label for="fullName">Full Name</label>
+
+        <input
+          id="fullName"
+          type="text"
+          name="fullName"
+          [(ngModel)]="fullName"
+          [class.invalid]="errors.fullName"
+          placeholder="Enter your full name"
+          autocomplete="name"
+        />
+
+        @if (errors.fullName) {
+          <p class="field-error">{{ errors.fullName }}</p>
+        }
+      </div>
+
+      <!-- Email -->
+      <div class="form-group">
+        <label for="email">Email Address</label>
+
+        <input
+          id="email"
+          type="email"
+          name="email"
+          [(ngModel)]="email"
+          [class.invalid]="errors.email"
+          placeholder="Enter your email"
+          autocomplete="email"
+        />
+
+        @if (errors.email) {
+          <p class="field-error">{{ errors.email }}</p>
+        }
+      </div>
+
+      <!-- Phone Number -->
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number</label>
+
+        <input
+          id="phoneNumber"
+          type="tel"
+          inputmode="numeric"
+          name="phoneNumber"
+          [(ngModel)]="phoneNumber"
+          [class.invalid]="errors.phone"
+          placeholder="10 digit mobile number"
+          autocomplete="tel"
+          maxlength="10"
+        />
+
+        @if (errors.phone) {
+          <p class="field-error">{{ errors.phone }}</p>
+        }
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password">Password</label>
+
+        <div class="input-wrap">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            name="password"
+            [(ngModel)]="password"
+            [class.invalid]="errors.password"
+            placeholder="Create a password"
+            autocomplete="new-password"
+          />
+
+          <button
+            type="button"
+            class="toggle-pw"
+            (click)="showPassword = !showPassword"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+          >
+            {{ showPassword ? "Hide" : "Show" }}
+          </button>
+        </div>
+
+        @if (errors.password) {
+          <p class="field-error">{{ errors.password }}</p>
+        } @else {
+          <p class="field-hint">At least {{ minPasswordLength }} characters, with an uppercase letter, a lowercase letter and a number.</p>
+        }
+      </div>
+
+      <!-- Confirm Password -->
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+
+        <input
+          id="confirmPassword"
+          [type]="showPassword ? 'text' : 'password'"
+          name="confirmPassword"
+          [(ngModel)]="confirmPassword"
+          [class.invalid]="errors.confirm"
+          placeholder="Confirm your password"
+          autocomplete="new-password"
+        />
+
+        @if (errors.confirm) {
+          <p class="field-error">{{ errors.confirm }}</p>
+        }
+      </div>
+
+      <!-- Register Button -->
+      <button type="submit" class="register-btn" [disabled]="loading">
+        @if (loading) {
+          <span class="spinner"></span>
+          Creating Account...
+        } @else {
+          Create Account
+        }
+      </button>
+
+    </form>
+
+    <!-- Login Link -->
+    <div class="login-link">
+      <span>Already have an account?</span>
+      <a routerLink="/login">Login</a>
+    </div>
+
+    <!-- Back Home -->
+    <a routerLink="/" class="back-home">← Back to menu</a>
+
+  </div>
+</div>

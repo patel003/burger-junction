@@ -1,0 +1,923 @@
+<div class="admin-page">
+
+  <!-- =========================
+       DASHBOARD HEADER
+  ========================== -->
+
+  <div class="admin-header">
+
+    <div class="header-content">
+      <span class="eyebrow">ADMIN PANEL</span>
+
+      <h1>Dashboard</h1>
+
+      <p>
+        Welcome back, Administrator. Here's what's happening
+        at Burger Junction today.
+      </p>
+    </div>
+
+    <div class="header-actions">
+
+      <button
+        type="button"
+        class="refresh-btn"
+        (click)="loadDashboard()"
+        [disabled]="loading"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M21 12a9 9 0 0 1-15.3 6.5"></path>
+          <path d="M3 12a9 9 0 0 1 15.3-6.5"></path>
+          <path d="M21 5v7h-7"></path>
+          <path d="M3 19v-7h7"></path>
+        </svg>
+
+        Refresh
+      </button>
+
+      <div class="admin-badge">
+
+        <span class="badge-avatar">
+          A
+        </span>
+
+        <div>
+          <strong>Administrator</strong>
+          <span>Admin</span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       LOADING
+  ========================== -->
+
+  @if (loading) {
+
+    <div class="dashboard-loading">
+
+      <div class="loading-spinner"></div>
+
+      <span>
+        Loading dashboard...
+      </span>
+
+    </div>
+
+  }
+
+
+  <!-- =========================
+       ERROR
+  ========================== -->
+
+  @if (errorMessage) {
+
+    <div class="dashboard-error">
+
+      <div>
+        {{ errorMessage }}
+      </div>
+
+      <button
+        type="button"
+        (click)="loadDashboard()"
+      >
+        Retry
+      </button>
+
+    </div>
+
+  }
+
+
+  <!-- =========================
+       DASHBOARD CONTENT
+  ========================== -->
+
+  @if (!loading && !errorMessage) {
+
+    <!-- =========================
+         STATISTICS
+    ========================== -->
+
+    <div class="stats-grid">
+
+      <!-- Total Orders -->
+
+      <div class="stat-card">
+
+        <div class="stat-card-top">
+
+          <div class="stat-icon orders-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M6 3h12v18H6z"></path>
+              <path d="M9 7h6"></path>
+              <path d="M9 11h6"></path>
+              <path d="M9 15h4"></path>
+            </svg>
+          </div>
+
+          <span class="stat-label">
+            Total Orders
+          </span>
+
+        </div>
+
+        <div class="stat-value">
+          {{ dashboard.totalOrders }}
+        </div>
+
+        <span class="stat-description">
+          All orders
+        </span>
+
+      </div>
+
+
+      <!-- Total Products -->
+
+      <div class="stat-card">
+
+        <div class="stat-card-top">
+
+          <div class="stat-icon products-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M4 7h16"></path>
+              <path d="M6 3h12l2 18H4L6 3Z"></path>
+              <path d="M9 7a3 3 0 0 0 6 0"></path>
+            </svg>
+          </div>
+
+          <span class="stat-label">
+            Total Products
+          </span>
+
+        </div>
+
+        <div class="stat-value">
+          {{ dashboard.totalProducts }}
+        </div>
+
+        <span class="stat-description">
+          Active products
+        </span>
+
+      </div>
+
+
+      <!-- Customers -->
+
+      <div class="stat-card">
+
+        <div class="stat-card-top">
+
+          <div class="stat-icon customers-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path
+                d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2"
+              ></path>
+
+              <circle
+                cx="9.5"
+                cy="7"
+                r="4"
+              ></circle>
+
+              <path
+                d="M17 11a4 4 0 1 0 0-8"
+              ></path>
+
+              <path
+                d="M21 21v-2a4 4 0 0 0-3-3.87"
+              ></path>
+            </svg>
+          </div>
+
+          <span class="stat-label">
+            Total Customers
+          </span>
+
+        </div>
+
+        <div class="stat-value">
+          {{ dashboard.totalCustomers }}
+        </div>
+
+        <span class="stat-description">
+          Registered users
+        </span>
+
+      </div>
+
+
+      <!-- Revenue -->
+
+      <div class="stat-card">
+
+        <div class="stat-card-top">
+
+          <div class="stat-icon revenue-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle
+                cx="12"
+                cy="12"
+                r="9"
+              ></circle>
+
+              <path d="M12 7v10"></path>
+
+              <path
+                d="M15 9.5c0-1.1-1.34-2-3-2s-3 .9-3 2 1.34 2 3 2 3 .9 3 2-1.34 2-3 2-3-.9-3-2"
+              ></path>
+            </svg>
+          </div>
+
+          <span class="stat-label">
+            Total Revenue
+          </span>
+
+        </div>
+
+        <div class="stat-value revenue-value">
+          ₹{{ dashboard.totalRevenue | number: "1.0-0" }}
+        </div>
+
+        <span class="stat-description">
+          Excluding cancelled orders
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <!-- =========================
+         MAIN ANALYTICS GRID
+    ========================== -->
+
+    <div class="analytics-grid">
+
+
+      <!-- =========================
+           REVENUE OVERVIEW
+      ========================== -->
+
+      <section class="dashboard-card revenue-card">
+
+        <div class="card-header">
+
+          <div>
+            <span class="section-label">
+              REVENUE
+            </span>
+
+            <h2>
+              Revenue Overview
+            </h2>
+          </div>
+
+          <span class="period-badge">
+            Last 7 Days
+          </span>
+
+        </div>
+
+
+        @if (dashboard.revenueOverview.length > 0) {
+
+          <div class="revenue-chart">
+
+            <div class="chart-y-axis">
+
+              <span>
+                ₹{{ getRevenueMax() | number: "1.0-0" }}
+              </span>
+
+              <span>
+                ₹{{ (getRevenueMax() * 0.75) | number: "1.0-0" }}
+              </span>
+
+              <span>
+                ₹{{ (getRevenueMax() * 0.5) | number: "1.0-0" }}
+              </span>
+
+              <span>
+                ₹{{ (getRevenueMax() * 0.25) | number: "1.0-0" }}
+              </span>
+
+              <span>₹0</span>
+
+            </div>
+
+
+            <div class="chart-area">
+
+              <div class="chart-grid-lines">
+
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+
+              </div>
+
+
+              <div class="chart-bars">
+
+                @for (
+                  item of dashboard.revenueOverview;
+                  track item.date
+                ) {
+
+                  <div class="chart-column">
+
+                    <div class="chart-bar-wrapper">
+
+                      <div
+                        class="chart-bar"
+                        [style.height]="
+                          getRevenueHeight(item.revenue)
+                        "
+                        [title]="
+                          '₹' +
+                          (item.revenue | number: '1.0-0')
+                        "
+                      >
+                      </div>
+
+                    </div>
+
+                    <span class="chart-date">
+                      {{ formatDashboardDate(item.date) }}
+                    </span>
+
+                  </div>
+
+                }
+
+              </div>
+
+            </div>
+
+          </div>
+
+        } @else {
+
+          <div class="chart-empty">
+            No revenue data available.
+          </div>
+
+        }
+
+      </section>
+
+
+      <!-- =========================
+           ORDER STATUS
+      ========================== -->
+
+      <section class="dashboard-card order-status-card">
+
+        <div class="card-header">
+
+          <div>
+            <span class="section-label">
+              ORDERS
+            </span>
+
+            <h2>
+              Order Status
+            </h2>
+          </div>
+
+          <span class="total-status">
+            {{ getTotalStatusCount() }} Total
+          </span>
+
+        </div>
+
+
+        @if (dashboard.orderStatus.length > 0) {
+
+          <div class="status-list">
+
+            @for (
+              item of dashboard.orderStatus;
+              track item.status
+            ) {
+
+              <div class="status-item">
+
+                <div class="status-row">
+
+                  <div class="status-name">
+
+                    <span
+                      class="status-dot"
+                      [class]="getStatusClass(item.status)"
+                    ></span>
+
+                    <span>
+                      {{ item.status }}
+                    </span>
+
+                  </div>
+
+                  <strong>
+                    {{ item.count }}
+                  </strong>
+
+                </div>
+
+                <div class="status-progress">
+
+                  <div
+                    class="status-progress-fill"
+                    [class]="getStatusClass(item.status)"
+                    [style.width.%]="
+                      getStatusPercentage(item.count)
+                    "
+                  ></div>
+
+                </div>
+
+                <span class="status-percentage">
+                  {{ getStatusPercentage(item.count) }}%
+                </span>
+
+              </div>
+
+            }
+
+          </div>
+
+        } @else {
+
+          <div class="chart-empty">
+            No order status data available.
+          </div>
+
+        }
+
+      </section>
+
+    </div>
+
+
+    <!-- =========================
+         QUICK ACTIONS
+    ========================== -->
+
+    <section class="dashboard-card quick-actions-card">
+
+      <div class="card-header">
+
+        <div>
+          <span class="section-label">
+            SHORTCUTS
+          </span>
+
+          <h2>
+            Quick Actions
+          </h2>
+        </div>
+
+      </div>
+
+
+      <div class="action-grid">
+
+        <a
+          routerLink="/admin/products"
+          class="action-card"
+        >
+
+          <span class="action-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 7h16"></path>
+              <path d="M6 3h12l2 18H4L6 3Z"></path>
+              <path d="M9 7a3 3 0 0 0 6 0"></path>
+            </svg>
+          </span>
+
+          <span>
+            Manage Products
+          </span>
+
+          <small>
+            Add or edit products
+          </small>
+
+        </a>
+
+
+        <a
+          routerLink="/admin/orders"
+          class="action-card"
+        >
+
+          <span class="action-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M6 3h12v18H6z"></path>
+              <path d="M9 7h6"></path>
+              <path d="M9 11h6"></path>
+              <path d="M9 15h4"></path>
+            </svg>
+          </span>
+
+          <span>
+            Manage Orders
+          </span>
+
+          <small>
+            Track and update orders
+          </small>
+
+        </a>
+
+
+        <a
+          routerLink="/admin/inventory"
+          class="action-card"
+        >
+
+          <span class="action-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 4h16v16H4z"></path>
+              <path d="M8 8h8"></path>
+              <path d="M8 12h8"></path>
+              <path d="M8 16h5"></path>
+            </svg>
+          </span>
+
+          <span>
+            Inventory
+          </span>
+
+          <small>
+            Manage stock levels
+          </small>
+
+        </a>
+
+
+        <a
+          routerLink="/admin/coupons"
+          class="action-card"
+        >
+
+          <span class="action-icon">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M20 12l-8 8-9-9V4h7l10 8Z"></path>
+              <circle
+                cx="7.5"
+                cy="8.5"
+                r="1"
+              ></circle>
+            </svg>
+          </span>
+
+          <span>
+            Coupons
+          </span>
+
+          <small>
+            Manage discount offers
+          </small>
+
+        </a>
+
+      </div>
+
+    </section>
+
+
+    <!-- =========================
+         BOTTOM DASHBOARD GRID
+    ========================== -->
+
+    <div class="bottom-dashboard-grid">
+
+
+      <!-- =========================
+           RECENT ORDERS
+      ========================== -->
+
+      <section class="dashboard-card table-card">
+
+        <div class="card-header">
+
+          <div>
+            <span class="section-label">
+              ORDERS
+            </span>
+
+            <h2>
+              Recent Orders
+            </h2>
+          </div>
+
+          <a
+            routerLink="/admin/orders"
+            class="view-all-link"
+          >
+            View all →
+          </a>
+
+        </div>
+
+
+        @if (dashboard.recentOrders.length > 0) {
+
+          <div class="recent-order-list">
+
+            @for (
+              order of dashboard.recentOrders;
+              track order.orderId
+            ) {
+
+              <div class="recent-order-item">
+
+                <div class="order-avatar">
+                  #{{ order.orderId }}
+                </div>
+
+                <div class="order-main">
+
+                  <strong>
+                    {{ order.customerName }}
+                  </strong>
+
+                  <span>
+                    Order #{{ order.orderId }}
+                    ·
+                    {{ formatOrderDate(order.createdAt) }}
+                  </span>
+
+                </div>
+
+                <div class="order-right">
+
+                  <strong>
+                    ₹{{ order.totalAmount | number: "1.0-0" }}
+                  </strong>
+
+                  <span
+                    class="order-status-badge"
+                    [class]="getStatusClass(order.status)"
+                  >
+                    {{ order.status }}
+                  </span>
+
+                </div>
+
+              </div>
+
+            }
+
+          </div>
+
+        } @else {
+
+          <div class="empty-table">
+            No recent orders found.
+          </div>
+
+        }
+
+      </section>
+
+
+      <!-- =========================
+           TOP SELLING PRODUCTS
+      ========================== -->
+
+      <section class="dashboard-card table-card">
+
+        <div class="card-header">
+
+          <div>
+            <span class="section-label">
+              PRODUCTS
+            </span>
+
+            <h2>
+              Top Selling Products
+            </h2>
+          </div>
+
+          <a
+            routerLink="/admin/products"
+            class="view-all-link"
+          >
+            View all →
+          </a>
+
+        </div>
+
+
+        @if (dashboard.topSellingProducts.length > 0) {
+
+          <div class="selling-list">
+
+            @for (
+              product of dashboard.topSellingProducts;
+              track product.productId
+            ) {
+
+              <div class="selling-item">
+
+                <div class="product-rank">
+                  {{ $index + 1 }}
+                </div>
+
+                <div class="selling-main">
+
+                  <strong>
+                    {{ product.productName }}
+                  </strong>
+
+                  <span>
+                    {{ product.quantitySold }} sold
+                  </span>
+
+                </div>
+
+                <div class="selling-revenue">
+                  ₹{{ product.revenue | number: "1.0-0" }}
+                </div>
+
+              </div>
+
+            }
+
+          </div>
+
+        } @else {
+
+          <div class="empty-table">
+            No sales data available.
+          </div>
+
+        }
+
+      </section>
+
+
+      <!-- =========================
+           RECENT CUSTOMERS
+      ========================== -->
+
+      <section class="dashboard-card table-card">
+
+        <div class="card-header">
+
+          <div>
+            <span class="section-label">
+              CUSTOMERS
+            </span>
+
+            <h2>
+              Recent Customers
+            </h2>
+          </div>
+
+          <a
+            routerLink="/admin/customers"
+            class="view-all-link"
+          >
+            View all →
+          </a>
+
+        </div>
+
+
+        @if (dashboard.recentCustomers.length > 0) {
+
+          <div class="customer-list">
+
+            @for (
+              customer of dashboard.recentCustomers;
+              track customer.userId
+            ) {
+
+              <div class="customer-item">
+
+                <div class="customer-avatar">
+
+                  {{ getCustomerInitials(customer.fullName) }}
+
+                </div>
+
+                <div class="customer-main">
+
+                  <strong>
+                    {{ customer.fullName }}
+                  </strong>
+
+                  <span>
+                    {{ customer.email }}
+                  </span>
+
+                </div>
+
+                <span class="customer-date">
+                  {{ formatOrderDate(customer.createdAt) }}
+                </span>
+
+              </div>
+
+            }
+
+          </div>
+
+        } @else {
+
+          <div class="empty-table">
+            No customers found.
+          </div>
+
+        }
+
+      </section>
+
+    </div>
+
+  }
+
+</div>

@@ -1,0 +1,34 @@
+<div class="rider-shell">
+  <header class="rider-topbar">
+    <div>
+      <span class="rider-brand">BURGER JUNCTION</span>
+      <strong>Rider Panel</strong>
+    </div>
+
+    <app-notification-bell></app-notification-bell>
+  </header>
+  <main class="rider-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <nav class="rider-bottom-nav">
+    <a
+      routerLink="/rider"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      <span class="nav-icon">🚴</span>
+      <small>Active</small>
+    </a>
+
+    <a routerLink="/rider/history" routerLinkActive="active">
+      <span class="nav-icon">📋</span>
+      <small>History</small>
+    </a>
+
+    <a routerLink="/rider/profile" routerLinkActive="active">
+      <span class="nav-icon">👤</span>
+      <small>Profile</small>
+    </a>
+  </nav>
+</div>

@@ -1,0 +1,95 @@
+<section class="services-section">
+  <div class="services-container">
+
+    <!-- =========================
+         HEADER
+    ========================== -->
+    <div class="page-header">
+      <div>
+        <h1>Catering &amp; events 🍽️</h1>
+        <p>Make your special moments memorable with our catering and event services.</p>
+      </div>
+    </div>
+
+    <!-- =========================
+         LOADING
+    ========================== -->
+    <div class="state-card" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Loading services...</p>
+    </div>
+
+    <!-- =========================
+         ERROR
+    ========================== -->
+    <div class="state-card error" *ngIf="!loading && errorMessage">
+      <div class="error-icon">!</div>
+      <h2>Unable to load services</h2>
+      <p>{{ errorMessage }}</p>
+      <button type="button" class="primary-btn" (click)="loadServices()">Try again</button>
+    </div>
+
+    <!-- =========================
+         SERVICES
+    ========================== -->
+    <div class="services-grid" *ngIf="!loading && !errorMessage && services.length > 0">
+
+      <article class="service-card" *ngFor="let service of services">
+
+        <div class="service-image">
+          <div class="image-placeholder">
+            <span>
+              <ng-container *ngIf="service.name.toLowerCase().includes('food truck')">🚚</ng-container>
+              <ng-container *ngIf="service.name.toLowerCase().includes('home delivery')">🏠</ng-container>
+              <ng-container *ngIf="service.name.toLowerCase().includes('corporate')">🏢</ng-container>
+              <ng-container *ngIf="service.name.toLowerCase().includes('wedding')">💍</ng-container>
+              <ng-container *ngIf="service.name.toLowerCase().includes('birthday')">🎂</ng-container>
+              <ng-container
+                *ngIf="
+                  !service.name.toLowerCase().includes('food truck') &&
+                  !service.name.toLowerCase().includes('home delivery') &&
+                  !service.name.toLowerCase().includes('corporate') &&
+                  !service.name.toLowerCase().includes('wedding') &&
+                  !service.name.toLowerCase().includes('birthday')
+                "
+              >
+                🍽️
+              </ng-container>
+            </span>
+          </div>
+
+          <img
+            *ngIf="service.imageUrl"
+            [src]="service.imageUrl"
+            [alt]="service.name"
+            loading="lazy"
+            (error)="$any($event.target).style.display = 'none'"
+          />
+        </div>
+
+        <div class="service-content">
+          <div class="service-top">
+            <h2>{{ service.name }}</h2>
+            <span class="service-price">{{ formatPrice(service.price) }}</span>
+          </div>
+
+          <p>{{ service.description }}</p>
+
+          <a routerLink="/contact" class="enquire-btn">Enquire now →</a>
+        </div>
+
+      </article>
+
+    </div>
+
+    <!-- =========================
+         EMPTY
+    ========================== -->
+    <div class="state-card" *ngIf="!loading && !errorMessage && services.length === 0">
+      <div class="empty-icon">🍽️</div>
+      <h2>Services coming soon</h2>
+      <p>We're preparing something special for you.</p>
+    </div>
+
+  </div>
+</section>

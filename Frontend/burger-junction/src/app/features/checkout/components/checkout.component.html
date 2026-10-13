@@ -1,0 +1,298 @@
+<section class="checkout-page">
+  <div class="checkout-container">
+    <!-- =========================
+         HEADER
+    ========================== -->
+    <div class="checkout-header">
+      <h1>Checkout 🍔</h1>
+      <a routerLink="/cart" class="back-cart-btn">← Back to cart</a>
+    </div>
+
+    <div class="checkout-grid">
+      <!-- =========================
+           LEFT: FORM
+      ========================== -->
+      <div class="checkout-main">
+        <!-- 1. Delivery details -->
+        <div class="checkout-card">
+          <div class="card-header">
+            <h2>Delivery details</h2>
+            <span class="header-icon">📍</span>
+          </div>
+
+          <div class="customer-form">
+            <div class="form-group">
+              <label for="customerName">Full name</label>
+              <input
+                id="customerName"
+                type="text"
+                [(ngModel)]="customerName"
+                placeholder="Enter your full name"
+                autocomplete="name"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="customerPhone">Phone number</label>
+              <input
+                id="customerPhone"
+                type="tel"
+                [(ngModel)]="customerPhone"
+                placeholder="Enter your phone number"
+                autocomplete="tel"
+              />
+            </div>
+
+            <div class="form-group full-width">
+              <label for="deliveryAddress">Delivery address</label>
+              <textarea
+                id="deliveryAddress"
+                [(ngModel)]="deliveryAddress"
+                (input)="addressEditedByUser = true"
+                placeholder="House / Flat, Street, Area, City..."
+                rows="4"
+                autocomplete="street-address"
+              ></textarea>
+            </div>
+
+            <div class="form-group full-width">
+              <label>Delivery location (map par pin lagayein)</label>
+              <div class="map-toolbar">
+                <button
+                  type="button"
+                  class="locate-btn"
+                  (click)="useMyLocation()"
+                  [disabled]="locating"
+                >
+                  {{
+                    locating
+                      ? "Location dhoondh rahe hain..."
+                      : "📍 Use my current location"
+                  }}
+                </button>
+                <small
+                  >Ya map par tap karein. Pin ko drag bhi kar sakte hain.</small
+                >
+              </div>
+              <div id="checkout-map" class="checkout-map"></div>
+              <p class="location-status ok" *ngIf="deliveryLatitude !== null">
+                ✓ Delivery location set ho gayi.
+              </p>
+              <p class="location-status error" *ngIf="locationMessage">
+                {{ locationMessage }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Payment -->
+        <div class="checkout-card">
+          <div class="card-header">
+            <h2>Payment method</h2>
+            <span class="header-icon">💳</span>
+          </div>
+
+          <div class="payment-options">
+            <label class="payment-option">
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="Cash on Delivery"
+                [(ngModel)]="paymentMethod"
+              />
+              <div class="payment-option-content">
+                <span class="payment-icon">💵</span>
+                <div>
+                  <strong>Cash on delivery</strong>
+                  <small>Pay when your order arrives</small>
+                </div>
+              </div>
+            </label>
+
+            <label class="payment-option">
+              <input
+                type="radio"
+                name="paymentMethod"
+                value="UPI"
+                [(ngModel)]="paymentMethod"
+              />
+              <div class="payment-option-content">
+                <span class="payment-icon">📱</span>
+                <div>
+                  <strong>UPI</strong>
+                  <small>Pay online now</small>
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- 3. Coupon -->
+        <div class="checkout-card">
+          <div class="card-header">
+            <h2>Have a coupon?</h2>
+            <span class="header-icon">%</span>
+          </div>
+
+          <div class="coupon-form">
+            <input
+              type="text"
+              [(ngModel)]="couponCode"
+              placeholder="Enter coupon code"
+              [disabled]="couponApplied"
+              (keyup.enter)="applyCoupon()"
+            />
+
+            <button
+              type="button"
+              (click)="applyCoupon()"
+              [disabled]="applyingCoupon || couponApplied"
+            >
+              <span *ngIf="!applyingCoupon && !couponApplied">Apply</span>
+              <span *ngIf="applyingCoupon">Applying...</span>
+              <span *ngIf="couponApplied">Applied ✓</span>
+            </button>
+          </div>
+
+          <div class="coupon-message success" *ngIf="couponApplied">
+            <span>✓</span>
+            <div>
+              <strong>{{ couponMessage }}</strong>
+              <small>You saved ₹{{ discountAmount | number: "1.2-2" }}</small>
+            </div>
+            <button
+              type="button"
+              class="remove-coupon-btn"
+              (click)="removeCoupon()"
+            >
+              Remove
+            </button>
+          </div>
+
+          <div class="coupon-message error" *ngIf="couponError">
+            <span>!</span>
+            <p>{{ couponMessage }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- =========================
+           RIGHT: ORDER SUMMARY
+      ========================== -->
+      <aside class="checkout-sidebar">
+        <div class="checkout-card summary-card">
+          <h2>Order summary</h2>
+
+          <!-- Items -->
+          <div class="summary-items">
+            @for (item of cartItems; track item.product.id) {
+              <div class="summary-item">
+                <div class="summary-item-image">
+                  <span>🍔</span>
+                  @if (item.product.imageUrl) {
+                    <img
+                      [src]="item.product.imageUrl"
+                      [alt]="item.product.name"
+                      (error)="$any($event.target).style.display = 'none'"
+                    />
+                  }
+                </div>
+
+                <div class="summary-item-info">
+                  <strong>{{ item.product.name }}</strong>
+                  <small
+                    >{{ item.quantity }} × ₹{{
+                      item.product.price | number: "1.2-2"
+                    }}</small
+                  >
+                </div>
+
+                <span class="summary-item-total">
+                  ₹{{ item.product.price * item.quantity | number: "1.2-2" }}
+                </span>
+              </div>
+            }
+          </div>
+
+          <!-- Bill -->
+          <div class="summary-row">
+            <span>Subtotal</span>
+            <strong>₹{{ orderAmount | number: "1.2-2" }}</strong>
+          </div>
+
+          <div class="summary-row discount-row" *ngIf="discountAmount > 0">
+            <span>Coupon discount</span>
+            <strong>−₹{{ discountAmount | number: "1.2-2" }}</strong>
+          </div>
+
+          <div class="summary-total">
+            <span>Total</span>
+            <strong>₹{{ finalAmount | number: "1.2-2" }}</strong>
+          </div>
+
+          <button type="button" class="place-order-btn" (click)="placeOrder()">
+            Place order →
+          </button>
+
+          <p class="delivery-note">⚡ Estimated delivery: 30–40 minutes</p>
+        </div>
+      </aside>
+    </div>
+
+    <!-- =========================
+         ORDER SUCCESS MODAL
+    ========================== -->
+    @if (showOrderSuccess) {
+      <div class="success-overlay">
+        <div class="success-modal" role="dialog" aria-modal="true">
+          <button
+            type="button"
+            class="success-close"
+            (click)="closeSuccessModal()"
+            aria-label="Close"
+          >
+            ×
+          </button>
+
+          <div class="success-icon">✓</div>
+
+          <h2>Order placed! 🎉</h2>
+
+          <p>
+            Thank you for ordering from Burger Junction. Your food is now being
+            prepared.
+          </p>
+
+          <div class="success-order-info">
+            <div>
+              <span>Order number</span>
+              <strong>#{{ successOrderId }}</strong>
+            </div>
+            <div>
+              <span>Total</span>
+              <strong>₹{{ successOrderTotal | number: "1.2-2" }}</strong>
+            </div>
+          </div>
+
+          <p class="success-eta">⚡ Estimated delivery: 30–40 minutes</p>
+
+          <button
+            type="button"
+            class="view-orders-btn"
+            (click)="viewMyOrders()"
+          >
+            Track my order →
+          </button>
+
+          <button
+            type="button"
+            class="continue-btn"
+            (click)="continueShopping()"
+          >
+            Continue shopping
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+</section>

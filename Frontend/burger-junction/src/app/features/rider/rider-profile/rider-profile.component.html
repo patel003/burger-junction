@@ -1,0 +1,88 @@
+<div class="rider-profile-page">
+  <header class="profile-header">
+    <div>
+      <span class="eyebrow">BURGER JUNCTION</span>
+      <h1>My Profile</h1>
+      <p>Your rider account and vehicle details.</p>
+    </div>
+
+    <div class="profile-avatar">
+      {{ profile?.fullName?.charAt(0)?.toUpperCase() || "R" }}
+    </div>
+  </header>
+
+  @if (loading) {
+    <section class="profile-card loading-card">
+      <div class="spinner"></div>
+      <p>Loading profile...</p>
+    </section>
+  }
+
+  @if (!loading && errorMessage) {
+    <section class="profile-card error-card">
+      <strong>Unable to load profile</strong>
+      <p>{{ errorMessage }}</p>
+
+      <button type="button" (click)="loadProfile()">
+        Try Again
+      </button>
+    </section>
+  }
+
+  @if (!loading && profile) {
+    <section class="profile-card">
+      <div class="profile-main">
+        <div class="large-avatar">
+          {{ profile.fullName.charAt(0).toUpperCase() }}
+        </div>
+
+        <div>
+          <h2>{{ profile.fullName }}</h2>
+          <span class="role-badge">Rider</span>
+        </div>
+      </div>
+
+      <div class="profile-details">
+        <div class="detail-row">
+          <span class="detail-icon">📞</span>
+
+          <div>
+            <small>Phone Number</small>
+            <strong>{{ profile.phoneNumber || "Not available" }}</strong>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-icon">🏍️</span>
+
+          <div>
+            <small>Vehicle Number</small>
+            <strong>{{ profile.vehicleNumber || "Not available" }}</strong>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-icon">🟢</span>
+
+          <div>
+            <small>Availability</small>
+            <strong>
+              {{ profile.isOnline ? "Online" : "Offline" }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-icon">✓</span>
+
+          <div>
+            <small>Account Status</small>
+            <strong>
+              {{ profile.isActive ? "Active" : "Inactive" }}
+            </strong>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+</div>

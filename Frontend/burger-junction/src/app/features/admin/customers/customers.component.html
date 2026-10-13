@@ -1,0 +1,247 @@
+<div class="admin-page">
+
+  <!-- Header -->
+  <div class="admin-header">
+    <div>
+      <span class="eyebrow">ADMIN PANEL</span>
+      <h1>Customers</h1>
+      <p>View and manage Burger Junction customers.</p>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-btn"
+      (click)="loadCustomers()"
+      [disabled]="loading"
+    >
+      🔄 Refresh
+    </button>
+  </div>
+
+
+  <!-- Error -->
+  @if (errorMessage) {
+    <div class="customer-error">
+      <span>{{ errorMessage }}</span>
+
+      <button
+        type="button"
+        (click)="loadCustomers()"
+      >
+        Retry
+      </button>
+    </div>
+  }
+
+
+  <!-- Main Content -->
+  @if (!errorMessage) {
+
+    <!-- Toolbar -->
+    <div class="customer-toolbar">
+
+      <div class="search-box">
+
+        <span class="search-icon">🔍</span>
+
+        <input
+          type="text"
+          [(ngModel)]="searchText"
+          (input)="searchCustomers()"
+          placeholder="Search by name, email or phone..."
+        />
+
+        @if (searchText) {
+          <button
+            type="button"
+            class="clear-search"
+            (click)="clearSearch()"
+          >
+            ✕
+          </button>
+        }
+
+      </div>
+
+      <div class="customer-count">
+        {{ filteredCustomers.length }}
+        {{ filteredCustomers.length === 1 ? 'Customer' : 'Customers' }}
+      </div>
+
+    </div>
+
+
+    <!-- Loading -->
+    @if (loading) {
+
+      <div class="customer-loading">
+
+        <div class="loading-spinner"></div>
+
+        <span>Loading customers...</span>
+
+      </div>
+
+    }
+
+
+    <!-- Empty -->
+    @if (!loading && filteredCustomers.length === 0) {
+
+      <div class="customer-empty">
+
+        <div class="empty-icon">👥</div>
+
+        @if (searchText) {
+
+          <h3>No customers found</h3>
+
+          <p>
+            Try searching with a different name, email or phone number.
+          </p>
+
+          <button
+            type="button"
+            (click)="clearSearch()"
+          >
+            Clear Search
+          </button>
+
+        } @else {
+
+          <h3>No customers yet</h3>
+
+          <p>
+            Customers will appear here after they register.
+          </p>
+
+        }
+
+      </div>
+
+    }
+
+
+    <!-- Customer Table -->
+    @if (!loading && filteredCustomers.length > 0) {
+
+      <div class="customer-card">
+
+        <div class="table-wrapper">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>CUSTOMER</th>
+                <th>EMAIL</th>
+                <th>PHONE</th>
+                <th>JOINED</th>
+                <th>STATUS</th>
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              @for (customer of filteredCustomers; track customer.id) {
+
+                <tr>
+
+                  <!-- Customer -->
+                  <td>
+
+                    <div class="customer-info">
+
+                      <div class="customer-avatar">
+                        {{ getInitials(customer.fullName) }}
+                      </div>
+
+                      <div>
+
+                        <strong>
+                          {{ customer.fullName }}
+                        </strong>
+
+                        <span>
+                          Customer
+                        </span>
+
+                      </div>
+
+                    </div>
+
+                  </td>
+
+
+                  <!-- Email -->
+                  <td>
+
+                    <span class="email">
+                      {{ customer.email }}
+                    </span>
+
+                  </td>
+
+
+                  <!-- Phone -->
+                  <td>
+
+                    @if (customer.phoneNumber) {
+
+                      <span class="phone">
+                        {{ customer.phoneNumber }}
+                      </span>
+
+                    } @else {
+
+                      <span class="not-provided">
+                        Not provided
+                      </span>
+
+                    }
+
+                  </td>
+
+
+                  <!-- Joined -->
+                  <td>
+
+                    <div class="joined-date">
+
+                      <strong>
+                        {{ formatDate(customer.createdAt) }}
+                      </strong>
+
+                    </div>
+
+                  </td>
+
+
+                  <!-- Status -->
+                  <td>
+
+                    <span class="status-badge">
+                      Active
+                    </span>
+
+                  </td>
+
+                </tr>
+
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    }
+
+  }
+
+</div>

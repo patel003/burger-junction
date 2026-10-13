@@ -1,0 +1,202 @@
+<div class="settings-page">
+  <!-- Page Header -->
+  <div class="settings-header">
+    <div>
+      <span class="eyebrow">ADMIN PANEL</span>
+      <h1>Settings</h1>
+      <p>Manage your Burger Junction administration preferences.</p>
+    </div>
+
+    <div class="settings-status">
+      <span class="status-dot"></span>
+      System Online
+    </div>
+  </div>
+
+  <!-- Settings Grid -->
+  <div class="settings-grid">
+    <!-- General Settings -->
+    <section class="settings-card">
+      <div class="card-header">
+        <div>
+          <span class="card-eyebrow">GENERAL</span>
+          <h2>Restaurant Settings</h2>
+        </div>
+
+        <span class="card-icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M3 10h18"></path>
+            <path d="M5 10v9"></path>
+            <path d="M19 10v9"></path>
+            <path d="M4 19h16"></path>
+            <path d="M4 10 12 3l8 7"></path>
+          </svg>
+        </span>
+      </div>
+
+      <div class="settings-body">
+        <div class="setting-row">
+          <div>
+            <strong>Restaurant Name</strong>
+            <span>Name displayed across the application.</span>
+          </div>
+
+          <div class="setting-value">{{ settings.restaurantName }}</div>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <strong>Currency</strong>
+            <span>Currency used for menu prices and orders.</span>
+          </div>
+
+          <div class="setting-value">{{ settings.currency }} (₹)</div>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <strong>Order Management</strong>
+            <span>Allow customers to place new orders.</span>
+          </div>
+
+          <label class="toggle">
+            <input type="checkbox" [(ngModel)]="settings.isOrderingEnabled" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Store Status -->
+    <section class="settings-card">
+      <div class="card-header">
+        <div>
+          <span class="card-eyebrow">AVAILABILITY</span>
+          <h2>Store Status</h2>
+        </div>
+
+        <span class="card-icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="m9 12 2 2 4-4"></path>
+          </svg>
+        </span>
+      </div>
+
+      <div class="settings-body">
+        <div class="setting-row">
+          <div>
+            <strong>Restaurant Status</strong>
+            <span>Control whether the restaurant accepts orders.</span>
+          </div>
+
+          @if (settings.isOrderingEnabled) {
+          <span class="active-badge">
+            <span></span>
+            Open
+          </span>
+          } @else {
+          <span class="closed-badge">
+            <span></span>
+            Closed
+          </span>
+          }
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <strong>Online Ordering</strong>
+            <span>Customers can currently place orders online.</span>
+          </div>
+
+          <label class="toggle">
+            <input
+              type="checkbox"
+              [(ngModel)]="settings.isOnlineOrderingEnabled"
+            />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Security -->
+  <section class="settings-card security-card">
+    <div class="card-header">
+      <div>
+        <span class="card-eyebrow">SECURITY</span>
+        <h2>Security & Account</h2>
+      </div>
+
+      <span class="card-icon">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <rect x="3" y="11" width="18" height="10" rx="2"></rect>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          <circle cx="12" cy="16" r="1"></circle>
+        </svg>
+      </span>
+    </div>
+
+    <div class="settings-body">
+      <div class="setting-row">
+        <div>
+          <strong>Administrator Access</strong>
+          <span>Only authorized administrators can access this panel.</span>
+        </div>
+
+        <span class="protected-badge"> Protected </span>
+      </div>
+
+      <div class="setting-row">
+        <div>
+          <strong>Authentication</strong>
+          <span>Administrator access is protected by JWT authentication.</span>
+        </div>
+
+        <span class="active-badge">
+          <span></span>
+          Enabled
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <div class="settings-actions">
+    @if (successMessage) {
+    <div class="settings-message success">{{ successMessage }}</div>
+    } @if (errorMessage) {
+    <div class="settings-message error">{{ errorMessage }}</div>
+    }
+
+    <button
+      type="button"
+      class="save-settings-button"
+      (click)="saveSettings()"
+      [disabled]="saving || loading"
+    >
+      @if (saving) { Saving... } @else { Save Settings }
+    </button>
+  </div>
+</div>

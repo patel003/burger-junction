@@ -1,0 +1,728 @@
+    <div class="admin-page">
+
+  <!-- Header -->
+  <div class="admin-header">
+    <div>
+      <span class="eyebrow">ADMIN PANEL</span>
+      <h1>Coupons</h1>
+      <p>Create, manage and track Burger Junction coupons.</p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="loadCoupons()"
+        [disabled]="loading"
+      >
+        🔄 Refresh
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary"
+        (click)="openAddModal()"
+      >
+        ➕ Add Coupon
+      </button>
+    </div>
+  </div>
+
+  <!-- Success -->
+  @if (successMessage) {
+    <div class="alert alert-success">
+      <span>✓</span>
+      <span>{{ successMessage }}</span>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (errorMessage) {
+    <div class="alert alert-error">
+      <span>⚠</span>
+      <span>{{ errorMessage }}</span>
+
+      <button
+        type="button"
+        (click)="clearMessages()"
+      >
+        ×
+      </button>
+    </div>
+  }
+
+  <!-- Toolbar -->
+  <div class="toolbar-card">
+
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+
+      <input
+        type="text"
+        [(ngModel)]="searchText"
+        (ngModelChange)="searchCoupons()"
+        placeholder="Search coupon code or description..."
+      />
+
+      @if (searchText) {
+        <button
+          type="button"
+          class="clear-search"
+          (click)="clearSearch()"
+        >
+          ×
+        </button>
+      }
+    </div>
+
+    <select
+      [(ngModel)]="selectedStatus"
+      (ngModelChange)="filterByStatus()"
+      class="status-filter"
+    >
+      <option value="All">All Status</option>
+      <option value="Active">Active</option>
+      <option value="Inactive">Inactive</option>
+    </select>
+
+    <div class="result-count">
+      {{ filteredCoupons.length }}
+      {{ filteredCoupons.length === 1 ? 'Coupon' : 'Coupons' }}
+    </div>
+
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+
+    <div class="state-card">
+      <div class="loader"></div>
+      <p>Loading coupons...</p>
+    </div>
+
+  }
+
+  <!-- Empty -->
+  @if (!loading && filteredCoupons.length === 0) {
+
+    <div class="state-card empty-state">
+
+      <div class="empty-icon">🎟️</div>
+
+      @if (searchText || selectedStatus !== 'All') {
+
+        <h3>No coupons found</h3>
+
+        <p>
+          Try changing your search or status filter.
+        </p>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="clearSearch(); selectedStatus = 'All'; filterByStatus()"
+        >
+          Clear Filters
+        </button>
+
+      } @else {
+
+        <h3>No coupons yet</h3>
+
+        <p>
+          Create your first coupon to start offering discounts.
+        </p>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="openAddModal()"
+        >
+          ➕ Add First Coupon
+        </button>
+
+      }
+
+    </div>
+
+  }
+
+  <!-- Coupon Table -->
+  @if (!loading && filteredCoupons.length > 0) {
+
+    <div class="table-card">
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>COUPON</th>
+              <th>DISCOUNT</th>
+              <th>MIN. ORDER</th>
+              <th>MAX. DISCOUNT</th>
+              <th>VALIDITY</th>
+              <th>USAGE</th>
+              <th>STATUS</th>
+              <th>ACTION</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            @for (
+              coupon of filteredCoupons;
+              track coupon.id
+            ) {
+
+              <tr>
+
+                <!-- Coupon -->
+                <td>
+
+                  <div class="coupon-cell">
+
+                    <div class="coupon-icon">
+                      🎟️
+                    </div>
+
+                    <div>
+
+                      <strong>
+                        {{ coupon.code }}
+                      </strong>
+
+                      <span>
+                        {{ coupon.description }}
+                      </span>
+
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <!-- Discount -->
+                <td>
+
+                  <span class="discount-badge">
+                    {{ getDiscountText(coupon) }}
+                  </span>
+
+                </td>
+
+                <!-- Minimum -->
+                <td>
+
+                  <strong class="amount">
+                    ₹{{ coupon.minimumOrderAmount | number:'1.0-2' }}
+                  </strong>
+
+                </td>
+
+                <!-- Maximum -->
+                <td>
+
+                  @if (
+                    coupon.maximumDiscountAmount !== null
+                  ) {
+
+                    <strong class="amount">
+                      ₹{{ coupon.maximumDiscountAmount | number:'1.0-2' }}
+                    </strong>
+
+                  } @else {
+
+                    <span class="muted">
+                      No limit
+                    </span>
+
+                  }
+
+                </td>
+
+                <!-- Validity -->
+                <td>
+
+                  <div class="date-cell">
+
+                    <strong>
+                      {{ formatDate(coupon.startDate) }}
+                    </strong>
+
+                    <span>
+                      to {{ formatDate(coupon.expiryDate) }}
+                    </span>
+
+                  </div>
+
+                </td>
+
+                <!-- Usage -->
+                <td>
+
+                  <div class="usage-cell">
+
+                    <strong>
+                      {{ coupon.usedCount }}
+                      /
+                      {{ coupon.usageLimit }}
+                    </strong>
+
+                    <div class="usage-bar">
+                      <div
+                        class="usage-progress"
+                        [style.width.%]="
+                          coupon.usageLimit > 0
+                            ? Math.min(
+                                (coupon.usedCount / coupon.usageLimit) * 100,
+                                100
+                              )
+                            : 0
+                        "
+                      ></div>
+                    </div>
+
+                  </div>
+
+                </td>
+
+                <!-- Status -->
+                <td>
+
+                  <span
+                    class="status-badge"
+                    [class.active]="coupon.isActive"
+                    [class.inactive]="!coupon.isActive"
+                  >
+                    <span class="status-dot"></span>
+                    {{ getStatusText(coupon) }}
+                  </span>
+
+                </td>
+
+                <!-- Actions -->
+                <td>
+
+                  <div class="action-buttons">
+
+                    <button
+                      type="button"
+                      class="icon-btn edit-btn"
+                      title="Edit coupon"
+                      (click)="openEditModal(coupon)"
+                    >
+                      ✏️
+                    </button>
+
+                    <button
+                      type="button"
+                      class="icon-btn delete-btn"
+                      title="Delete coupon"
+                      (click)="openDeleteModal(coupon)"
+                    >
+                      🗑️
+                    </button>
+
+                  </div>
+
+                </td>
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </div>
+
+  }
+
+</div>
+
+
+<!-- ========================= -->
+<!-- ADD / EDIT COUPON MODAL -->
+<!-- ========================= -->
+
+@if (showCouponModal) {
+
+  <div
+    class="modal-backdrop"
+    (click)="closeCouponModal()"
+  >
+
+    <div
+      class="modal"
+      (click)="$event.stopPropagation()"
+    >
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+
+        <div>
+          <span class="modal-eyebrow">
+            {{ editingId !== null ? 'EDIT COUPON' : 'NEW COUPON' }}
+          </span>
+
+          <h2>
+            {{ editingId !== null
+              ? 'Edit Coupon'
+              : 'Create Coupon'
+            }}
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          class="modal-close"
+          (click)="closeCouponModal()"
+          [disabled]="saving"
+        >
+          ×
+        </button>
+
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body">
+
+        @if (errorMessage) {
+
+          <div class="form-error">
+            ⚠ {{ errorMessage }}
+          </div>
+
+        }
+
+        <div class="form-grid">
+
+          <!-- Code -->
+          <div class="form-group">
+
+            <label>
+              Coupon Code
+              <span>*</span>
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="couponCode"
+              placeholder="e.g. BURGER50"
+              maxlength="50"
+              style="text-transform: uppercase;"
+            />
+
+            <small>
+              Customers will enter this code at checkout.
+            </small>
+
+          </div>
+
+          <!-- Description -->
+          <div class="form-group full-width">
+
+            <label>
+              Description
+              <span>*</span>
+            </label>
+
+            <textarea
+              [(ngModel)]="couponDescription"
+              placeholder="e.g. 50% discount on your order"
+              rows="3"
+            ></textarea>
+
+          </div>
+
+          <!-- Discount Type -->
+          <div class="form-group">
+
+            <label>
+              Discount Type
+              <span>*</span>
+            </label>
+
+            <select
+              [(ngModel)]="selectedDiscountType"
+            >
+
+              @for (
+                type of discountTypes;
+                track type
+              ) {
+
+                <option [value]="type">
+                  {{ type }}
+                </option>
+
+              }
+
+            </select>
+
+          </div>
+
+          <!-- Discount Value -->
+          <div class="form-group">
+
+            <label>
+              Discount Value
+              <span>*</span>
+            </label>
+
+            <div class="input-with-symbol">
+
+              @if (selectedDiscountType === 'Percentage') {
+                <span>%</span>
+              } @else {
+                <span>₹</span>
+              }
+
+              <input
+                type="number"
+                [(ngModel)]="couponDiscountValue"
+                min="0"
+                [max]="
+                  selectedDiscountType === 'Percentage'
+                    ? 100
+                    : null
+                "
+                placeholder="50"
+              />
+
+            </div>
+
+          </div>
+
+          <!-- Minimum Order -->
+          <div class="form-group">
+
+            <label>
+              Minimum Order Amount
+              <span>*</span>
+            </label>
+
+            <div class="input-with-symbol">
+
+              <span>₹</span>
+
+              <input
+                type="number"
+                [(ngModel)]="couponMinimumOrderAmount"
+                min="0"
+                placeholder="299"
+              />
+
+            </div>
+
+          </div>
+
+          <!-- Maximum Discount -->
+          <div class="form-group">
+
+            <label>
+              Maximum Discount
+            </label>
+
+            <div class="input-with-symbol">
+
+              <span>₹</span>
+
+              <input
+                type="number"
+                [(ngModel)]="couponMaximumDiscountAmount"
+                min="0"
+                placeholder="150"
+              />
+
+            </div>
+
+            <small>
+              Leave empty for no maximum limit.
+            </small>
+
+          </div>
+
+          <!-- Start Date -->
+          <div class="form-group">
+
+            <label>
+              Start Date
+              <span>*</span>
+            </label>
+
+            <input
+              type="datetime-local"
+              [(ngModel)]="couponStartDate"
+            />
+
+          </div>
+
+          <!-- Expiry Date -->
+          <div class="form-group">
+
+            <label>
+              Expiry Date
+              <span>*</span>
+            </label>
+
+            <input
+              type="datetime-local"
+              [(ngModel)]="couponExpiryDate"
+            />
+
+          </div>
+
+          <!-- Usage Limit -->
+          <div class="form-group">
+
+            <label>
+              Usage Limit
+              <span>*</span>
+            </label>
+
+            <input
+              type="number"
+              [(ngModel)]="couponUsageLimit"
+              min="1"
+              placeholder="100"
+            />
+
+          </div>
+
+          <!-- Active -->
+          <div class="form-group toggle-group">
+
+            <label>
+              Status
+            </label>
+
+            <label class="toggle">
+
+              <input
+                type="checkbox"
+                [(ngModel)]="couponIsActive"
+              />
+
+              <span class="toggle-slider"></span>
+
+              <span class="toggle-label">
+                {{ couponIsActive ? 'Active' : 'Inactive' }}
+              </span>
+
+            </label>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="modal-footer">
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeCouponModal()"
+          [disabled]="saving"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="saveCoupon()"
+          [disabled]="saving"
+        >
+
+          @if (saving) {
+            Saving...
+          } @else {
+            {{ editingId !== null
+              ? 'Update Coupon'
+              : 'Create Coupon'
+            }}
+          }
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}
+
+
+<!-- ========================= -->
+<!-- DELETE MODAL -->
+<!-- ========================= -->
+
+@if (showDeleteModal && deleteCoupon) {
+
+  <div
+    class="modal-backdrop"
+    (click)="closeDeleteModal()"
+  >
+
+    <div
+      class="delete-modal"
+      (click)="$event.stopPropagation()"
+    >
+
+      <div class="delete-icon">
+        🗑️
+      </div>
+
+      <h2>Delete Coupon?</h2>
+
+      <p>
+        Are you sure you want to delete
+        <strong>{{ deleteCoupon.code }}</strong>?
+      </p>
+
+      <span class="delete-warning">
+        This action cannot be undone.
+      </span>
+
+      <div class="delete-actions">
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeDeleteModal()"
+          [disabled]="deleting"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="confirmDelete()"
+          [disabled]="deleting"
+        >
+
+          @if (deleting) {
+            Deleting...
+          } @else {
+            Delete Coupon
+          }
+
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+}

@@ -1,0 +1,82 @@
+<div class="profile-page">
+  <div class="profile-container">
+
+    <!-- =========================
+         HEADER
+    ========================== -->
+    <section class="profile-hero">
+      <div class="profile-avatar">{{ userInitial }}</div>
+
+      <div class="profile-heading">
+        <h1>{{ userName }}</h1>
+        <span class="role-badge">{{ userRole }}</span>
+      </div>
+    </section>
+
+    <!-- =========================
+         DETAILS
+    ========================== -->
+    <section class="profile-card">
+      <h2>Personal information</h2>
+
+      <dl class="details-list">
+        <div class="detail-row">
+          <dt>Full name</dt>
+          <dd>{{ userName }}</dd>
+        </div>
+
+        <div class="detail-row">
+          <dt>Email</dt>
+          <dd>{{ userEmail }}</dd>
+        </div>
+
+        <div class="detail-row">
+          <dt>Phone</dt>
+          <dd>{{ userPhone }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <!-- =========================
+         QUICK LINKS
+    ========================== -->
+    <section class="profile-card">
+      <h2>Quick links</h2>
+
+      <div class="quick-actions">
+        <a routerLink="/orders" class="quick-action">
+          <span class="quick-icon">📦</span>
+          <span class="quick-text">
+            <strong>My orders</strong>
+            <small>View and track your orders</small>
+          </span>
+          <b>→</b>
+        </a>
+
+        <a routerLink="/offers" class="quick-action">
+          <span class="quick-icon">🎁</span>
+          <span class="quick-text">
+            <strong>Offers</strong>
+            <small>Discover the latest coupons</small>
+          </span>
+          <b>→</b>
+        </a>
+
+        <a routerLink="/menu" class="quick-action">
+          <span class="quick-icon">🍔</span>
+          <span class="quick-text">
+            <strong>Browse menu</strong>
+            <small>Find something delicious</small>
+          </span>
+          <b>→</b>
+        </a>
+      </div>
+    </section>
+
+    <!-- =========================
+         LOGOUT
+    ========================== -->
+    <button type="button" class="logout-btn" (click)="logout()">Log out</button>
+
+  </div>
+</div>

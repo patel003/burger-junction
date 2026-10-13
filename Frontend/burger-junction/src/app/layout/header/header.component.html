@@ -1,0 +1,236 @@
+<header class="main-header">
+  <div class="header-container">
+    <!-- BRAND -->
+    <a routerLink="/" class="brand">
+      <div class="brand-icon">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M4 10h16" />
+          <path d="M5 10c0-4 3-7 7-7s7 3 7 7" />
+          <path d="M5 14h14" />
+          <path d="M6 18h12" />
+          <path d="M7 14v4" />
+          <path d="M17 14v4" />
+        </svg>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Burger Junction</span>
+        <span class="brand-tagline">Fresh. Fast. Delicious.</span>
+      </div>
+    </a>
+
+    <!-- DESKTOP NAVIGATION -->
+    <nav class="nav-menu">
+      <a
+        routerLink="/"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-link"
+        >Home</a
+      >
+      <a routerLink="/menu" routerLinkActive="active" class="nav-link">Menu</a>
+      <a routerLink="/offers" routerLinkActive="active" class="nav-link"
+        >Offers</a
+      >
+      <a routerLink="/orders" routerLinkActive="active" class="nav-link"
+        >My Orders</a
+      >
+
+      <!-- More: Services, About, Contact -->
+      <div class="dropdown" [class.open]="dropdownOpen">
+        <button
+          type="button"
+          class="nav-link more-btn"
+          (click)="toggleMoreDropdown()"
+        >
+          More
+          <span class="caret">▾</span>
+        </button>
+
+        <div class="dropdown-panel">
+          <a
+            routerLink="/services"
+            routerLinkActive="active"
+            class="dropdown-link"
+            (click)="closeMoreDropdown()"
+          >
+            Services
+          </a>
+
+          <a
+            routerLink="/about"
+            routerLinkActive="active"
+            class="dropdown-link"
+            (click)="closeMoreDropdown()"
+          >
+            About Us
+          </a>
+
+          <a
+            routerLink="/contact"
+            routerLinkActive="active"
+            class="dropdown-link"
+            (click)="closeMoreDropdown()"
+          >
+            Contact
+          </a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- RIGHT ACTIONS -->
+    <div class="header-actions">
+      @if (!isLoggedIn) {
+        <a routerLink="/login" class="login-btn">Login</a>
+        <a routerLink="/register" class="register-btn">Register</a>
+      }
+
+      @if (isLoggedIn) {
+        <div class="notification-wrapper" (click)="closeMobileMenu(mobileMenu)">
+          <app-notification-bell></app-notification-bell>
+        </div>
+
+        <a routerLink="/cart" class="cart-btn">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M3 4h2l2.4 11.2a2 2 0 0 0 2 1.6h7.8a2 2 0 0 0 1.9-1.4L21 8H6"
+            />
+            <circle cx="10" cy="20" r="1.3" />
+            <circle cx="18" cy="20" r="1.3" />
+          </svg>
+          <span>Cart</span>
+        </a>
+
+        <!-- Profile dropdown (Logout andar hai) -->
+        <div class="dropdown profile-dropdown">
+          <a routerLink="/profile" class="profile-link">
+            <div class="user-avatar">
+              {{ userName.charAt(0).toUpperCase() }}
+            </div>
+            <div class="user-info">
+              <span class="welcome-text">Welcome</span>
+              <span class="user-name">{{ userName }}</span>
+            </div>
+          </a>
+          <div class="dropdown-panel right">
+            <a routerLink="/profile" class="dropdown-link">My Profile</a>
+            <a routerLink="/orders" class="dropdown-link">My Orders</a>
+            <button
+              type="button"
+              class="dropdown-link logout-link"
+              (click)="logout()"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- MOBILE MENU -->
+      <details class="mobile-menu" #mobileMenu>
+        <summary class="mobile-menu-btn" (click)="closeNotificationIfOpen()">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+          >
+            <path d="M4 6h16" />
+            <path d="M4 12h16" />
+            <path d="M4 18h16" />
+          </svg>
+        </summary>
+
+        <div class="mobile-menu-panel">
+          <a
+            routerLink="/"
+            class="mobile-link"
+            (click)="closeMobileMenu(mobileMenu)"
+          >
+            Home
+          </a>
+
+          <a
+            routerLink="/menu"
+            class="mobile-link"
+            (click)="closeMobileMenu(mobileMenu)"
+          >
+            Menu
+          </a>
+
+          <a
+            routerLink="/offers"
+            class="mobile-link"
+            (click)="closeMobileMenu(mobileMenu)"
+          >
+            Offers
+          </a>
+
+          <a
+            routerLink="/orders"
+            class="mobile-link"
+            (click)="closeMobileMenu(mobileMenu)"
+          >
+            My Orders
+          </a>
+
+          <a
+            routerLink="/services"
+            class="mobile-link"
+            (click)="closeMobileMenu(mobileMenu)"
+          >
+            Services
+          </a>
+
+          <a
+            routerLink="/about"
+            class="mobile-link"
+            (click)="closeMobileMenu(mobileMenu)"
+          >
+            About Us
+          </a>
+
+          <a
+            routerLink="/contact"
+            class="mobile-link"
+            (click)="closeMobileMenu(mobileMenu)"
+          >
+            Contact
+          </a>
+
+          @if (isLoggedIn) {
+            <a
+              routerLink="/profile"
+              class="mobile-link"
+              (click)="closeMobileMenu(mobileMenu)"
+            >
+              Profile
+            </a>
+
+            <button
+              type="button"
+              class="mobile-link mobile-logout"
+              (click)="closeMobileMenu(mobileMenu); logout()"
+            >
+              Logout
+            </button>
+          }
+        </div>
+      </details>
+    </div>
+  </div>
+</header>

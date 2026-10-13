@@ -1,0 +1,51 @@
+/* Naye elements + site ka lal rang (#ed1b45) */
+
+.input-wrap { position: relative; }
+.input-wrap input { padding-right: 68px; }
+
+.toggle-pw {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: #64748b;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toggle-pw:hover { color: #ed1b45; }
+.toggle-pw:focus-visible { outline: 2px solid #ed1b45; outline-offset: 1px; }
+
+.field-error { margin: 6px 0 0; color: #b91c1c; font-size: 12px; font-weight: 600; }
+.field-hint  { margin: 6px 0 0; color: #64748b; font-size: 12px; }
+
+.form-group input.invalid { border-color: #ef4444; }
+
+.form-group input:focus {
+  border-color: #ed1b45;
+  box-shadow: 0 0 0 3px rgba(237, 27, 69, 0.1);
+}
+
+.brand h1 { color: #ed1b45; }
+.login-btn { background: #ed1b45; }
+.login-btn:hover:not(:disabled) { background: #d4143a; }
+.register-link a { color: #ed1b45; }
+.back-home:hover { color: #ed1b45; }
+
+.forgot-link {
+  display: block;
+  margin-top: 8px;
+  color: #ed1b45;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: right;
+  text-decoration: none;
+}
+
+.forgot-link:hover { text-decoration: underline; }

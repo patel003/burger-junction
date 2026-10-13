@@ -1,0 +1,313 @@
+<div class="analytics-page">
+  <!-- Page Header -->
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span>Admin</span>
+        <span class="separator">›</span>
+        <span>Analytics</span>
+      </div>
+
+      <h1>Sales & Analytics</h1>
+      <p>Track your restaurant's sales and order performance.</p>
+    </div>
+
+    <button
+      type="button"
+      class="refresh-btn"
+      (click)="loadAnalytics()"
+      [disabled]="loading"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M20 11a8.1 8.1 0 0 0-15.5-2M4 5v4h4" />
+        <path d="M4 13a8.1 8.1 0 0 0 15.5 2M20 19v-4h-4" />
+      </svg>
+
+      <span>{{ loading ? 'Refreshing...' : 'Refresh' }}</span>
+    </button>
+  </div>
+
+  <!-- Loading -->
+  @if (loading) {
+  <div class="state-card">
+    <div class="loader"></div>
+    <p>Loading analytics...</p>
+  </div>
+  }
+
+  <!-- Error -->
+  @if (!loading && errorMessage) {
+  <div class="error-card">
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 8v4" />
+      <path d="M12 16h.01" />
+    </svg>
+
+    <div>
+      <strong>Unable to load analytics</strong>
+      <p>{{ errorMessage }}</p>
+    </div>
+  </div>
+  }
+
+  <!-- Analytics Content -->
+  @if (!loading && !errorMessage) {
+
+  <!-- Summary Cards -->
+  <div class="stats-grid">
+    <!-- Today's Sales -->
+    <div class="stat-card">
+      <div class="stat-top">
+        <div class="stat-icon sales-icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 3v18" />
+            <path
+              d="M17 7.5c0-1.7-2.2-3-5-3s-5 1.3-5 3 2.2 3 5 3 5 1.3 5 3-2.2 3-5 3-5-1.3-5-3"
+            />
+          </svg>
+        </div>
+
+        <span class="stat-label">Today</span>
+      </div>
+
+      <div class="stat-value">₹{{ analytics.todaySales | number:'1.2-2' }}</div>
+
+      <div class="stat-description">Today's sales</div>
+    </div>
+
+    <!-- Monthly Sales -->
+    <div class="stat-card">
+      <div class="stat-top">
+        <div class="stat-icon monthly-icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="3" y="4" width="18" height="17" rx="2" />
+            <path d="M16 2v4M8 2v4M3 10h18" />
+            <path d="M8 14h2M14 14h2M8 17h2" />
+          </svg>
+        </div>
+
+        <span class="stat-label">This Month</span>
+      </div>
+
+      <div class="stat-value">
+        ₹{{ analytics.monthlySales | number:'1.2-2' }}
+      </div>
+
+      <div class="stat-description">Current month sales</div>
+    </div>
+
+    <!-- Total Orders -->
+    <div class="stat-card">
+      <div class="stat-top">
+        <div class="stat-icon orders-icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M6 3h12v18H6z" />
+            <path d="M9 3v3h6V3" />
+            <path d="M9 11h6M9 15h4" />
+          </svg>
+        </div>
+
+        <span class="stat-label">All Time</span>
+      </div>
+
+      <div class="stat-value">{{ analytics.totalOrders }}</div>
+
+      <div class="stat-description">Total orders</div>
+    </div>
+
+    <!-- Average Order -->
+    <div class="stat-card">
+      <div class="stat-top">
+        <div class="stat-icon average-icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 19V5" />
+            <path d="M4 19h16" />
+            <path d="M7 15l4-4 3 2 5-6" />
+          </svg>
+        </div>
+
+        <span class="stat-label">Average</span>
+      </div>
+
+      <div class="stat-value">
+        ₹{{ analytics.averageOrderValue | number:'1.2-2' }}
+      </div>
+
+      <div class="stat-description">Average order value</div>
+    </div>
+  </div>
+
+  <!-- Detailed Analytics -->
+  <div class="analytics-grid">
+    <!-- Order Status -->
+    <div class="analytics-card">
+      <div class="card-header">
+        <div>
+          <h2>Order Status</h2>
+          <p>Current order distribution</p>
+        </div>
+
+        <div class="header-icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 4h16v16H4z" />
+            <path d="M8 15v-3M12 15V8M16 15v-5" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="status-list">
+        <div class="status-row">
+          <div class="status-name">
+            <span class="status-dot pending"></span>
+            <span>Pending</span>
+          </div>
+
+          <strong>{{ analytics.pendingOrders }}</strong>
+        </div>
+
+        <div class="status-row">
+          <div class="status-name">
+            <span class="status-dot confirmed"></span>
+            <span>Confirmed</span>
+          </div>
+
+          <strong>{{ analytics.confirmedOrders }}</strong>
+        </div>
+
+        <div class="status-row">
+          <div class="status-name">
+            <span class="status-dot preparing"></span>
+            <span>Preparing</span>
+          </div>
+
+          <strong>{{ analytics.preparingOrders }}</strong>
+        </div>
+
+        <div class="status-row">
+          <div class="status-name">
+            <span class="status-dot out-for-delivery"></span>
+            <span>Out for Delivery</span>
+          </div>
+
+          <strong>{{ analytics.outForDeliveryOrders }}</strong>
+        </div>
+
+        <div class="status-row">
+          <div class="status-name">
+            <span class="status-dot delivered"></span>
+            <span>Delivered</span>
+          </div>
+
+          <strong>{{ analytics.deliveredOrders }}</strong>
+        </div>
+
+        <div class="status-row">
+          <div class="status-name">
+            <span class="status-dot cancelled"></span>
+            <span>Cancelled</span>
+          </div>
+
+          <strong>{{ analytics.cancelledOrders }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sales Summary -->
+    <div class="analytics-card">
+      <div class="card-header">
+        <div>
+          <h2>Sales Overview</h2>
+          <p>Revenue summary</p>
+        </div>
+
+        <div class="header-icon">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 19V5" />
+            <path d="M4 19h16" />
+            <path d="M7 15l3-4 3 2 4-6" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="sales-summary">
+        <div class="sales-item">
+          <span>Today's Sales</span>
+          <strong> ₹{{ analytics.todaySales | number:'1.2-2' }} </strong>
+        </div>
+
+        <div class="sales-divider"></div>
+
+        <div class="sales-item">
+          <span>Monthly Sales</span>
+          <strong> ₹{{ analytics.monthlySales | number:'1.2-2' }} </strong>
+        </div>
+
+        <div class="sales-divider"></div>
+
+        <div class="sales-item">
+          <span>Average Order</span>
+          <strong> ₹{{ analytics.averageOrderValue | number:'1.2-2' }} </strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  }
+</div>

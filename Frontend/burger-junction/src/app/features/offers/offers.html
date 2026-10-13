@@ -1,0 +1,182 @@
+<div class="offers-page">
+  <div class="offers-container">
+
+    <!-- HEADER -->
+    <div class="page-header">
+      <div>
+        <h1>Offers 🎁</h1>
+        <p>Copy a code, then apply it at checkout.</p>
+      </div>
+
+      <a routerLink="/menu" class="menu-link">Browse menu</a>
+    </div>
+
+    <!-- LOADING -->
+    @if (loading) {
+
+      <div class="state-card">
+        <div class="loader"></div>
+        <span>Loading the best deals...</span>
+      </div>
+
+    }
+
+    <!-- ERROR -->
+    @else if (errorMessage) {
+
+      <div class="error-card">
+        <div class="error-icon">!</div>
+
+        <div class="error-text">
+          <strong>Offers unavailable</strong>
+          <p>{{ errorMessage }}</p>
+        </div>
+
+        <button type="button" class="retry-btn" (click)="loadOffers()">Retry</button>
+      </div>
+
+    }
+
+    <!-- EMPTY -->
+    @else if (coupons.length === 0) {
+
+      <div class="state-card">
+        <div class="empty-icon">🎁</div>
+        <h2>No active offers right now</h2>
+        <p>Check back soon for new Burger Junction deals.</p>
+        <a routerLink="/menu" class="primary-btn">Browse menu</a>
+      </div>
+
+    }
+
+    <!-- OFFERS -->
+    @else {
+
+      <!-- HERO -->
+      @if (bestCoupon; as best) {
+        <section class="offers-hero">
+          <div>
+            <h2>
+              @if (maxSaving > 0) {
+                Save up to ₹{{ maxSaving }} on your next burger
+              } @else {
+                Save on your next burger
+              }
+            </h2>
+            <p>
+              Best deal right now: {{ getDiscountText(best) }} with code
+              <strong>{{ best.code }}</strong>.
+            </p>
+          </div>
+          <button type="button" class="hero-btn" (click)="useOffer(best.code)">
+            Order with {{ best.code }}
+          </button>
+        </section>
+      }
+
+      <!-- HOW IT WORKS -->
+      <section class="how-it-works" aria-label="How to use an offer">
+        @for (step of steps; track step.title; let i = $index) {
+          <div class="step">
+            <span class="step-num">{{ i + 1 }}</span>
+            <div>
+              <strong>{{ step.title }}</strong>
+              <p>{{ step.text }}</p>
+            </div>
+          </div>
+        }
+      </section>
+
+      <!-- FILTER TABS -->
+      @if (hasBothTypes) {
+        <div class="filter-tabs" role="tablist">
+          <button type="button" role="tab" [class.active]="activeFilter === 'all'"
+                  [attr.aria-selected]="activeFilter === 'all'" (click)="setFilter('all')">All offers</button>
+          <button type="button" role="tab" [class.active]="activeFilter === 'percentage'"
+                  [attr.aria-selected]="activeFilter === 'percentage'" (click)="setFilter('percentage')">% off</button>
+          <button type="button" role="tab" [class.active]="activeFilter === 'flat'"
+                  [attr.aria-selected]="activeFilter === 'flat'" (click)="setFilter('flat')">Flat ₹ off</button>
+        </div>
+      }
+
+      <div class="offers-grid">
+        @for (coupon of filteredCoupons; track coupon.id) {
+
+          <article class="offer-card">
+
+            <div class="card-top">
+              <div class="discount-value">{{ getDiscountText(coupon) }}</div>
+              @if (getExpiryBadge(coupon)) {
+                <span class="expiry-badge">{{ getExpiryBadge(coupon) }}</span>
+              }
+            </div>
+
+            <h2>{{ coupon.description || "Special Burger Junction offer" }}</h2>
+
+            <!-- Coupon code -->
+            <div class="offer-code-box">
+              <div>
+                <small>Coupon code</small>
+                <strong>{{ coupon.code }}</strong>
+              </div>
+
+              <button type="button" class="copy-btn" (click)="copyCode(coupon.code)">
+                {{ copiedCode === coupon.code ? "Copied ✓" : "Copy" }}
+              </button>
+            </div>
+
+            <!-- Terms -->
+            <ul class="offer-terms">
+              <li>
+                {{
+                  coupon.minimumOrderAmount > 0
+                    ? "Minimum order ₹" + coupon.minimumOrderAmount
+                    : "No minimum order"
+                }}
+              </li>
+
+              @if (coupon.maximumDiscountAmount) {
+                <li>Maximum saving ₹{{ coupon.maximumDiscountAmount }}</li>
+              }
+
+              <li>{{ getExpiryText(coupon) }}</li>
+            </ul>
+
+            <!-- Uses left -->
+            @if (coupon.usageLimit > 0) {
+              <div class="uses-left">
+                <div class="uses-text">
+                  <span>{{ getUsesLeft(coupon) }} of {{ coupon.usageLimit }} uses left</span>
+                </div>
+                <div class="uses-bar" role="progressbar" aria-label="Uses left"
+                     [attr.aria-valuenow]="getUsesLeftPercent(coupon)" aria-valuemin="0" aria-valuemax="100">
+                  <span [style.width.%]="getUsesLeftPercent(coupon)"
+                        [class.low]="getUsesLeftPercent(coupon) <= 20"></span>
+                </div>
+              </div>
+            }
+
+            <button type="button" class="use-offer-btn" (click)="useOffer(coupon.code)">
+              Use offer →
+            </button>
+
+          </article>
+
+        }
+      </div>
+
+      <!-- FAQ -->
+      <section class="faq" aria-label="Offer questions">
+        <h2>Offer questions</h2>
+        @for (item of faqs; track item.q) {
+          <details>
+            <summary>{{ item.q }}</summary>
+            <p>{{ item.a }}</p>
+          </details>
+        }
+      </section>
+
+    }
+
+  </div>
+</div>

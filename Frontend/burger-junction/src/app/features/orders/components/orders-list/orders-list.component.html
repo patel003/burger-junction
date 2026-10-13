@@ -1,0 +1,259 @@
+<div class="orders-page">
+  <div class="orders-container">
+    <!-- =========================
+         HEADER
+    ========================== -->
+    <div class="page-header">
+      <div>
+        <h1>My orders</h1>
+        <p>Track your current order and see past orders.</p>
+      </div>
+
+      <a routerLink="/menu" class="back-menu">Browse menu</a>
+    </div>
+
+    <!-- =========================
+         LOADING
+    ========================== -->
+    @if (loading) {
+      <div class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading your orders...</p>
+      </div>
+    }
+
+    <!-- =========================
+         ERROR
+    ========================== -->
+    @if (!loading && errorMessage) {
+      <div class="error-state">
+        <div class="error-icon">⚠</div>
+        <h3>Unable to load orders</h3>
+        <p>{{ errorMessage }}</p>
+        <button type="button" class="retry-btn" (click)="loadOrders()">
+          Try again
+        </button>
+      </div>
+    }
+
+    <!-- =========================
+         EMPTY
+    ========================== -->
+    @if (!loading && !errorMessage && orders.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">🍔</div>
+        <h2>No orders yet</h2>
+        <p>You haven't placed any orders yet. Start exploring our menu!</p>
+        <a routerLink="/menu" class="order-now-btn">Order now</a>
+      </div>
+    }
+
+    <!-- =========================
+         ORDERS
+    ========================== -->
+    @if (!loading && !errorMessage && orders.length > 0) {
+      <div class="orders-list">
+        @for (order of orders; track order.id) {
+          <article class="order-card">
+            <!-- Header -->
+            <div class="order-header">
+              <div>
+                <h2>Order #{{ order.id }}</h2>
+                <span class="order-date">
+                  {{ order.createdAt | date: "dd MMM yyyy, hh:mm a" }}
+                </span>
+              </div>
+
+              <span
+                class="status-badge"
+                [class.pending]="order.status.toLowerCase() === 'pending'"
+                [class.confirmed]="order.status.toLowerCase() === 'confirmed'"
+                [class.preparing]="order.status.toLowerCase() === 'preparing'"
+                [class.completed]="order.status.toLowerCase() === 'completed'"
+                [class.cancelled]="order.status.toLowerCase() === 'cancelled'"
+              >
+                {{ order.status }}
+              </span>
+            </div>
+
+            <!-- Tracking: sirf chal rahe order ke liye -->
+            @if (
+              order.status.toLowerCase() !== "completed" &&
+              order.status.toLowerCase() !== "cancelled"
+            ) {
+              <div class="order-tracking">
+                <div class="tracking-timeline">
+                  <div
+                    class="tracking-step"
+                    [class.completed]="isStatusCompleted(order.status, 0)"
+                    [class.current]="isCurrentStatus(order.status, 0)"
+                  >
+                    <div class="step-icon">
+                      {{ isStatusCompleted(order.status, 0) ? "✓" : "" }}
+                    </div>
+                    <strong>Placed</strong>
+                  </div>
+
+                  <div
+                    class="tracking-step"
+                    [class.completed]="isStatusCompleted(order.status, 1)"
+                    [class.current]="isCurrentStatus(order.status, 1)"
+                  >
+                    <div class="step-icon">
+                      {{ isStatusCompleted(order.status, 1) ? "✓" : "" }}
+                    </div>
+                    <strong>Confirmed</strong>
+                  </div>
+
+                  <div
+                    class="tracking-step"
+                    [class.completed]="isStatusCompleted(order.status, 2)"
+                    [class.current]="isCurrentStatus(order.status, 2)"
+                  >
+                    <div class="step-icon">
+                      {{ isStatusCompleted(order.status, 2) ? "✓" : "" }}
+                    </div>
+                    <strong>Preparing</strong>
+                  </div>
+
+                  <div
+                    class="tracking-step"
+                    [class.completed]="isStatusCompleted(order.status, 3)"
+                    [class.current]="isCurrentStatus(order.status, 3)"
+                  >
+                    <div class="step-icon">
+                      {{ isStatusCompleted(order.status, 3) ? "✓" : "" }}
+                    </div>
+                    <strong>On the way</strong>
+                  </div>
+
+                  <div
+                    class="tracking-step"
+                    [class.completed]="isStatusCompleted(order.status, 4)"
+                    [class.current]="isCurrentStatus(order.status, 4)"
+                  >
+                    <div class="step-icon">
+                      {{ isStatusCompleted(order.status, 4) ? "✓" : "" }}
+                    </div>
+                    <strong>Delivered</strong>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- Items -->
+            <div class="order-items">
+              @for (item of order.items; track item.productId) {
+                <div class="order-item">
+                  <div class="item-icon">🍔</div>
+
+                  <div class="item-name">
+                    <strong>{{ item.productName }}</strong>
+                    <span>{{ item.quantity }} × ₹{{ item.price }}</span>
+                  </div>
+
+                  <strong class="item-total"
+                    >₹{{ item.price * item.quantity }}</strong
+                  >
+                </div>
+              }
+            </div>
+            <!-- RIDER INFO + LIVE TRACKING -->
+            @if (
+              order.riderName &&
+              order.status.toLowerCase() === "out for delivery"
+            ) {
+              <div class="rider-info">
+                <div class="rider-details">
+                  <span class="info-label">Your rider</span>
+                  <strong>{{ order.riderName }}</strong>
+                </div>
+
+                <div class="rider-actions">
+                  @if (order.riderPhone) {
+                    <a
+                      class="call-rider-btn"
+                      [href]="'tel:' + order.riderPhone"
+                    >
+                      📞 Call rider
+                    </a>
+                  }
+
+                  <a
+                    class="track-rider-btn"
+                    [routerLink]="['/track-order']"
+                    [queryParams]="{ orderId: order.id }"
+                  >
+                    📍 Track Rider Live
+                  </a>
+                </div>
+              </div>
+            }
+
+            <!-- Delivery + Payment -->
+            <div class="order-info">
+              <div class="info-block">
+                <span class="info-label">Delivering to</span>
+                <strong
+                  >{{ order.customerName }} · {{ order.customerPhone }}</strong
+                >
+                <p>{{ order.deliveryAddress }}</p>
+              </div>
+
+              <div class="info-block">
+                <span class="info-label">Payment</span>
+                <strong>{{ order.paymentMethod || "Not available" }}</strong>
+
+                <span
+                  class="payment-status"
+                  [class.paid]="order.paymentStatus?.toLowerCase() === 'paid'"
+                  [class.pending]="
+                    order.paymentStatus?.toLowerCase() === 'pending'
+                  "
+                  [class.failed]="
+                    order.paymentStatus?.toLowerCase() === 'failed'
+                  "
+                  [class.cancelled]="
+                    order.paymentStatus?.toLowerCase() === 'cancelled'
+                  "
+                >
+                  {{ order.paymentStatus || "Not available" }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="order-footer">
+              <a routerLink="/menu" class="reorder-btn">Order again</a>
+
+              <div class="amount-breakdown">
+                @if (order.couponCode && order.discountAmount > 0) {
+                  <div class="amount-row">
+                    <span>Subtotal</span>
+                    <strong
+                      >₹{{
+                        order.totalAmount + (order.discountAmount || 0)
+                      }}</strong
+                    >
+                  </div>
+
+                  <div class="amount-row coupon-row">
+                    <span
+                      >Coupon <small>{{ order.couponCode }}</small></span
+                    >
+                    <strong>−₹{{ order.discountAmount }}</strong>
+                  </div>
+                }
+
+                <div class="amount-row total-row">
+                  <span>Total</span>
+                  <strong>₹{{ order.totalAmount }}</strong>
+                </div>
+              </div>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </div>
+</div>

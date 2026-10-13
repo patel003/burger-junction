@@ -1,0 +1,544 @@
+.tracking-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 28px 20px 80px;
+  color: #172033;
+}
+
+.tracking-header,
+.order-heading,
+.map-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.tracking-header {
+  margin-bottom: 24px;
+}
+
+.brand {
+  color: #dc2626;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.tracking-header h1 {
+  margin: 8px 0;
+  font-size: 29px;
+}
+
+.tracking-header p,
+.muted {
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.tracking-card {
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
+}
+
+.order-heading {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.order-heading h2 {
+  margin: 6px 0 0;
+}
+
+.live-badge,
+.status-badge,
+.live-map-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 12px;
+  border-radius: 22px;
+  background: #f0fdf4;
+  color: #15803d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.live-badge.offline {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.live-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #16a34a;
+}
+
+.delivery-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  overflow-wrap: anywhere;
+}
+
+.detail-item strong {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.destination-message,
+.message-box,
+.error-message,
+.waiting-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 18px 0;
+  padding: 15px;
+  border-radius: 12px;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.error-message {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.map-heading {
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.map-heading h3 {
+  margin: 0 0 5px;
+  font-size: 18px;
+}
+
+.map-heading p {
+  margin: 0;
+}
+
+.rider-live-map {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 430px;
+  margin: 14px 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #f1f5f9;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 14px 0;
+  color: #475569;
+  font-size: 12px;
+}
+
+.legend > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.legend-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+}
+
+.rider-dot {
+  background: #dc2626;
+}
+
+.customer-dot {
+  background: #16a34a;
+}
+
+.legend-line {
+  width: 22px;
+  height: 4px;
+  border-radius: 5px;
+  background: #dc2626;
+}
+
+.route-message {
+  margin: 12px 0;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.route-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.stat-card > div {
+  display: grid;
+  gap: 5px;
+}
+
+.stat-card .muted {
+  font-size: 12px;
+}
+
+.stat-card strong {
+  font-size: 20px;
+  color: #172033;
+}
+
+.stat-icon {
+  font-size: 25px;
+}
+
+.waiting-message {
+  display: block;
+  text-align: center;
+  padding: 24px;
+}
+
+.waiting-icon {
+  font-size: 34px;
+}
+
+.waiting-message h3 {
+  margin: 10px 0 6px;
+  color: #172033;
+}
+
+.waiting-message p {
+  margin-bottom: 0;
+  color: #64748b;
+}
+
+.coordinates {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 20px 0;
+}
+
+.coordinate-box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 13px;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.coordinate-box strong {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.map-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.map-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #dc2626;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.map-button:hover {
+  background: #b91c1c;
+}
+
+.secondary-button {
+  background: #172033;
+}
+
+.secondary-button:hover {
+  background: #334155;
+}
+
+.disclaimer {
+  margin-top: 20px;
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.customer-map-pin,
+.rider-map-pin {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border: 3px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 9px rgba(0, 0, 0, 0.3);
+  font-size: 22px;
+}
+
+.customer-map-pin {
+  background: #16a34a;
+}
+
+.rider-map-pin {
+  background: #dc2626;
+  font-size: 24px;
+}
+
+@media (max-width: 650px) {
+  .tracking-page {
+    padding: 18px 12px 70px;
+  }
+
+  .tracking-card {
+    padding: 16px;
+  }
+
+  .tracking-header {
+    align-items: flex-start;
+  }
+
+  .tracking-header h1 {
+    font-size: 23px;
+  }
+
+  .tracking-header p {
+    max-width: 230px;
+  }
+
+  .tracking-header,
+  .map-heading {
+    flex-wrap: wrap;
+  }
+
+  .order-heading {
+    align-items: flex-start;
+  }
+
+  .delivery-details,
+  .route-stats,
+  .coordinates {
+    grid-template-columns: 1fr;
+  }
+
+  .rider-live-map {
+    height: 320px;
+  }
+
+  .map-actions {
+    flex-direction: column;
+  }
+
+  .map-button {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+/* ===== order-tracking.css ke END me ye add karo ===== */
+
+.stepper {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 22px 0 8px;
+}
+
+.step {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+  text-align: center;
+}
+
+.step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: calc(50% + 20px);
+  right: calc(-50% + 20px);
+  height: 3px;
+  border-radius: 3px;
+  background: #e2e8f0;
+}
+
+.step.done:not(:last-child)::after {
+  background: #16a34a;
+}
+
+.step-dot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.step.done .step-dot {
+  background: #16a34a;
+  color: #fff;
+}
+
+.step.active .step-dot {
+  background: #dc2626;
+  color: #fff;
+  box-shadow: 0 0 0 5px rgba(220, 38, 38, 0.15);
+}
+
+.step-label {
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.step.active .step-label,
+.step.done .step-label {
+  color: #172033;
+}
+
+.call-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 8px 12px;
+  border-radius: 9px;
+  background: #16a34a;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.call-btn:hover {
+  background: #15803d;
+}
+
+.last-update {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 12px 0;
+  color: #15803d;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.last-update.stale {
+  color: #c2410c;
+}
+
+.last-update.stale .live-dot {
+  background: #f97316;
+}
+
+button.map-button {
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+@media (max-width: 650px) {
+  .step-label {
+    font-size: 11px;
+  }
+}
+
+/* ===== Delivery OTP card ===== */
+
+.otp-card {
+  margin: 18px 0;
+  padding: 18px;
+  border: 1px dashed #f59e0b;
+  border-radius: 14px;
+  background: #fffbeb;
+  text-align: center;
+}
+
+.otp-code {
+  margin: 8px 0;
+  color: #172033;
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: 9px;
+  /* letter-spacing ki wajah se last digit ke baad ka extra gap hataata hai */
+  padding-left: 9px;
+}
+
+.otp-note,
+.otp-waiting {
+  margin: 0;
+  color: #92400e;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.otp-waiting {
+  margin-top: 6px;
+}
+
+@media (max-width: 650px) {
+  .otp-code {
+    font-size: 28px;
+    letter-spacing: 7px;
+    padding-left: 7px;
+  }
+}

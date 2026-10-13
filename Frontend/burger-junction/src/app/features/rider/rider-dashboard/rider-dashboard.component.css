@@ -1,0 +1,507 @@
+:host {
+  display: block;
+}
+
+.rp {
+  --ink: #14231c;
+  --grey: #4d5f56;
+  --line: #dfe6e2;
+  --green: #ef2929; /* naam purana hai, rang ab admin wala laal */
+  --green-light: #fdeaea;
+  --ok: #0b6b4a; /* sirf success/live/paid ke liye hara */
+  --ok-light: #e6f6ee;
+
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: var(--ink);
+  font-family: "DM Sans", "Proxima Nova", system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+}
+
+/* Global style se aane wale safed text se bachne ke liye har text ka rang pakka */
+.rp h2,
+.rp h3,
+.rp p,
+.rp b,
+.rp strong,
+.rp span,
+.rp small,
+.rp label,
+.rp summary {
+  color: inherit;
+}
+
+/* =========================
+   TODAY + DUTY
+========================= */
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.top-label {
+  display: block;
+  color: var(--grey);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.top-amount {
+  display: block;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.top-sub {
+  display: block;
+  margin-top: 2px;
+  color: var(--grey);
+  font-size: 13px;
+}
+
+.duty {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 22px;
+  background: #fff;
+  color: var(--grey);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.duty-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #9aa7a0;
+}
+
+.duty.on {
+  border-color: transparent;
+  background: var(--green-light);
+  color: var(--green);
+}
+
+.duty.on .duty-dot {
+  background: #1ba672;
+}
+
+.duty:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* =========================
+   BANNERS
+========================= */
+
+.banner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 11px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.banner.live {
+  background: var(--ok-light);
+  color: var(--ok);
+}
+
+.banner.warn {
+  background: #fff4e5;
+  color: #8a4300;
+}
+
+.pulse {
+  position: relative;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #1ba672;
+}
+
+.pulse::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border: 2px solid #1ba672;
+  border-radius: 50%;
+  opacity: 0;
+  animation: ping 1.6s ease-out infinite;
+}
+
+@keyframes ping {
+  0% {
+    transform: scale(0.5);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+/* =========================
+   CURRENT DELIVERY
+========================= */
+
+.focus {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  border: 1.5px solid var(--line);
+  border-radius: 22px;
+  background: #fff;
+}
+
+.focus-tag {
+  color: var(--green);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.who {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.who-text {
+  min-width: 0;
+}
+
+.who h2 {
+  margin: 0;
+  font-size: 23px;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.addr {
+  margin: 4px 0 0;
+  color: var(--grey);
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.call {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--green-light);
+  color: var(--green);
+}
+
+/* Progress */
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  color: var(--grey);
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.bar {
+  display: block;
+  height: 6px;
+  margin-bottom: 6px;
+  border-radius: 3px;
+  background: var(--line);
+}
+
+.step.done {
+  color: var(--ink);
+}
+
+.step.done .bar {
+  background: var(--green);
+}
+
+/* Payment */
+
+.cash {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid #ffe3a3;
+  border-radius: 14px;
+  background: #fff8e6;
+  color: #7a4e00;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cash strong {
+  font-size: 18px;
+}
+
+.cash.paid {
+  border-color: #c4e8d6;
+  background: var(--ok-light);
+  color: var(--ok);
+}
+
+.cash.paid strong {
+  font-size: 14px;
+}
+
+/* Items */
+
+.items summary {
+  color: var(--green);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+/* OTP */
+
+.otp-label {
+  color: var(--grey);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.otp {
+  width: 100%;
+  height: 54px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 10px;
+  text-align: center;
+}
+
+.otp:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(239, 41, 41, 0.15);
+}
+
+/* Buttons */
+
+.cta {
+  height: 58px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--green);
+  color: #fff;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cta:disabled {
+  background: #b8c7bf;
+  cursor: default;
+}
+
+.cta:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.ghost {
+  height: 48px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ghost.green {
+  border-color: var(--green);
+  color: var(--green);
+}
+
+.ghost:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.note {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff4e5;
+  color: #8a4300;
+  font-size: 13px;
+}
+
+/* =========================
+   NEXT UP
+========================= */
+
+.next h3 {
+  margin: 0 0 10px;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.next-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.next-row small {
+  display: block;
+  margin-top: 2px;
+  color: var(--grey);
+}
+
+.arrow {
+  font-size: 24px;
+  color: var(--grey);
+}
+
+.next-empty {
+  padding: 16px;
+  border: 1.5px dashed #cdd8d2;
+  border-radius: 18px;
+  color: var(--grey);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* =========================
+   EMPTY / SKELETON
+========================= */
+
+.empty {
+  padding: 34px 20px;
+  border: 1.5px solid var(--line);
+  border-radius: 22px;
+  background: #fff;
+  text-align: center;
+}
+
+.empty-art {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  background: var(--green-light);
+  color: var(--green);
+}
+
+.empty-art.waiting {
+  animation: bob 1.8s ease-in-out infinite;
+}
+
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.empty h3 {
+  margin: 14px 0 6px;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.empty p {
+  margin: 0;
+  color: var(--grey);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.skeleton {
+  height: 300px;
+  border-radius: 22px;
+  background: linear-gradient(90deg, #ecf0ee 25%, #f6f8f7 50%, #ecf0ee 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.3s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .empty-art.waiting,
+  .skeleton,
+  .pulse::after {
+    animation: none;
+  }
+}
+.otp::placeholder {
+  color: #b8c7bf;
+  letter-spacing: 10px;
+}

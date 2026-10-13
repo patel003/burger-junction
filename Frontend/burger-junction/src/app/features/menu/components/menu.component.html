@@ -1,0 +1,194 @@
+<div class="menu-page">
+  <!-- HEADING -->
+  <header class="menu-head">
+    @if (!inProducts) {
+      <h1>Our menu 🍔</h1>
+      <p>Pick a category to see what's inside.</p>
+    } @else {
+      <button type="button" class="back-btn" (click)="backToCategories()">
+        ← Categories
+      </button>
+      <h1>{{ showAll ? "All items" : selectedCategory?.name }}</h1>
+    }
+  </header>
+
+  <div class="food-filter">
+    <button
+      type="button"
+      [class.active]="foodFilter === 'all'"
+      (click)="foodFilter = 'all'"
+    >
+      All
+    </button>
+
+    <button
+      type="button"
+      [class.active]="foodFilter === 'veg'"
+      (click)="foodFilter = 'veg'"
+    >
+      🟢 Veg
+    </button>
+
+    <button
+      type="button"
+      [class.active]="foodFilter === 'nonVeg'"
+      (click)="foodFilter = 'nonVeg'"
+    >
+      🔴 Non-Veg
+    </button>
+  </div>
+
+  @if (error) {
+    <div class="state-box">
+      <div class="state-icon">⚠️</div>
+      <h3>Something went wrong</h3>
+      <p>{{ error }}</p>
+      <button
+        type="button"
+        class="state-btn"
+        (click)="loadProducts(); loadCategories()"
+      >
+        Try again
+      </button>
+    </div>
+  } @else if (loading) {
+    <div class="state-box">
+      <div class="state-icon">🍔</div>
+      <h3>Loading delicious food...</h3>
+      <p>Please wait a moment.</p>
+    </div>
+  } @else if (!inProducts) {
+    <!-- =========================
+         CATEGORY CARDS
+    ========================== -->
+    <section class="products-section">
+      <div class="cat-grid">
+        @for (category of visibleCategories; track category.id) {
+          <button
+            type="button"
+            class="cat-card"
+            (click)="openCategory(category.id)"
+          >
+            <div class="cat-cover">
+              <span class="cat-emoji">{{ getEmoji(category) }}</span>
+              @if (getCover(category)) {
+                <img
+                  [src]="getCover(category)"
+                  [alt]="category.name"
+                  loading="lazy"
+                  (error)="$any($event.target).style.display = 'none'"
+                />
+              }
+            </div>
+            <div class="cat-info">
+              <h3>{{ category.name }}</h3>
+              <span
+                >{{ getCount(category) }}
+                {{ getCount(category) === 1 ? "item" : "items" }}</span
+              >
+            </div>
+          </button>
+        }
+      </div>
+
+      @if (visibleCategories.length === 0) {
+        <div class="state-box">
+          <div class="state-icon">🍽️</div>
+          <h3>No categories yet</h3>
+          <p>Please check back soon.</p>
+        </div>
+      }
+
+      @if (products.length > 0) {
+        <button type="button" class="view-all-link" (click)="openAll()">
+          View all {{ products.length }} items
+        </button>
+      }
+    </section>
+  } @else {
+    <!-- =========================
+         ITEMS INSIDE CATEGORY
+    ========================== -->
+    <section class="products-section">
+      <div class="products-heading">
+        <h2>
+          {{ visibleProducts.length }}
+          {{ visibleProducts.length === 1 ? "item" : "items" }}
+        </h2>
+      </div>
+
+      @if (visibleProducts.length === 0) {
+        <div class="state-box">
+          <div class="state-icon">🍽️</div>
+          <h3>No items in this category</h3>
+          <p>Try another category.</p>
+          <button type="button" class="state-btn" (click)="backToCategories()">
+            Back to categories
+          </button>
+        </div>
+      } @else {
+        <div class="product-grid">
+          @for (product of visibleProducts; track product.id) {
+            <article
+              class="product-card"
+              [class.is-unavailable]="!product.isAvailable"
+            >
+              <div class="product-image">
+                <div class="image-placeholder">🍔</div>
+
+                @if (product.imageUrl) {
+                  <img
+                    [src]="product.imageUrl"
+                    [alt]="product.name"
+                    loading="lazy"
+                    (error)="$any($event.target).style.display = 'none'"
+                  />
+                }
+
+                @if (!product.isAvailable) {
+                  <span class="unavailable-badge">Unavailable</span>
+                }
+              </div>
+
+              <div class="product-content">
+                @if (showAll) {
+                  <span class="product-category">{{
+                    product.categoryName
+                  }}</span>
+                }
+
+                <h3>{{ product.name }}</h3>
+
+                <p>{{ product.description }}</p>
+
+                <div class="product-footer">
+                  <strong class="price">₹{{ product.price }}</strong>
+
+                  <button
+                    type="button"
+                    class="add-button"
+                    [disabled]="!product.isAvailable"
+                    (click)="addToCart(product)"
+                  >
+                    {{ product.isAvailable ? "+ Add" : "Unavailable" }}
+                  </button>
+                </div>
+              </div>
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+
+  <!-- CART BAR -->
+  @if (cartCount > 0) {
+    <button type="button" class="cart-bar" (click)="goToCart()">
+      <span
+        >🛒 {{ cartCount }} {{ cartCount === 1 ? "item" : "items" }} in
+        cart</span
+      >
+      <strong>View cart →</strong>
+    </button>
+  }
+</div>

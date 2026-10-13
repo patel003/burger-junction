@@ -1,0 +1,19 @@
+.main-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+}
+
+.page-content {
+  flex: 1 0 auto;
+  width: 100%;
+  min-height: 0;
+}
+
+/* Footer ko normal document flow me rakho */
+app-footer {
+  display: block;
+  flex-shrink: 0;
+  position: static !important;
+}

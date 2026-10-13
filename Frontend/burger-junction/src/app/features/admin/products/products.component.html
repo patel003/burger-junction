@@ -1,0 +1,467 @@
+<div class="products-page">
+  <!-- =========================
+       PAGE HEADER
+  ========================== -->
+
+  <div class="page-header">
+    <div>
+      <span class="eyebrow">ADMIN PANEL</span>
+
+      <h1>Products</h1>
+
+      <p>Manage Burger Junction products from one place.</p>
+    </div>
+
+    <div class="header-actions">
+      <button
+        type="button"
+        class="refresh-btn"
+        (click)="loadProducts()"
+        [disabled]="loading"
+      >
+        🔄 Refresh
+      </button>
+
+      <button type="button" class="add-btn" (click)="openAddModal()">
+        + Add Product
+      </button>
+    </div>
+  </div>
+
+  <!-- =========================
+       SUCCESS MESSAGE
+  ========================== -->
+
+  @if (successMessage) {
+    <div class="success-box">✅ {{ successMessage }}</div>
+  }
+
+  <!-- =========================
+       ERROR MESSAGE
+  ========================== -->
+
+  @if (errorMessage) {
+    <div class="error-box">⚠️ {{ errorMessage }}</div>
+  }
+
+  <!-- =========================
+       SEARCH TOOLBAR
+  ========================== -->
+
+  <div class="toolbar">
+    <div class="search-box">
+      <span>🔍</span>
+
+      <input
+        type="text"
+        placeholder="Search products..."
+        [(ngModel)]="searchText"
+        (input)="searchProducts()"
+      />
+
+      @if (searchText) {
+        <button type="button" class="clear-btn" (click)="clearSearch()">
+          ✕
+        </button>
+      }
+    </div>
+
+    <div class="product-count">{{ filteredProducts.length }} Products</div>
+  </div>
+
+  <!-- =========================
+       LOADING
+  ========================== -->
+
+  @if (loading) {
+    <div class="loading-box">
+      <div class="spinner"></div>
+
+      <p>Loading products...</p>
+    </div>
+  }
+
+  <!-- =========================
+       EMPTY
+  ========================== -->
+
+  @else if (filteredProducts.length === 0) {
+    <div class="empty-box">
+      <div class="empty-icon">🍔</div>
+
+      <h2>No Products Found</h2>
+
+      <p>There are no products matching your search.</p>
+
+      <button type="button" class="add-btn" (click)="openAddModal()">
+        + Add Product
+      </button>
+    </div>
+  }
+
+  <!-- =========================
+       PRODUCTS TABLE
+  ========================== -->
+
+  @else {
+    <div class="products-table">
+      <!-- TABLE HEADER -->
+
+      <div class="table-header">
+        <span>Product</span>
+        <span>Category</span>
+        <span>Price</span>
+        <span>Status</span>
+        <span>Actions</span>
+      </div>
+
+      <!-- SCROLLABLE TABLE BODY -->
+
+      <div class="products-table-body">
+        @for (product of paginatedProducts; track product.id) {
+          <div class="product-row">
+            <!-- PRODUCT -->
+
+            <div class="product-info">
+              <div class="product-image">🍔</div>
+
+              <div>
+                <strong>
+                  {{ product.name }}
+                </strong>
+
+                <p>
+                  {{ product.description }}
+                </p>
+              </div>
+            </div>
+
+            <!-- CATEGORY -->
+
+            <div class="category">
+              {{ product.categoryName }}
+            </div>
+
+            <!-- PRICE -->
+
+            <div class="price">₹{{ product.price }}</div>
+
+            <!-- STATUS -->
+
+            <div>
+              @if (product.isAvailable) {
+                <span class="status active"> ● Active </span>
+              } @else {
+                <span class="status expired"> ● Unavailable </span>
+              }
+            </div>
+
+            <!-- ACTIONS -->
+
+            <div class="product-actions">
+              <button
+                type="button"
+                class="edit-btn"
+                title="Edit product"
+                (click)="openEditModal(product)"
+              >
+                ✏️
+              </button>
+
+              <button
+                type="button"
+                class="delete-btn"
+                title="Delete product"
+                (click)="openDeleteModal(product)"
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- PAGINATION -->
+
+      @if (totalPages > 1) {
+        <div class="pagination">
+          <button
+            type="button"
+            class="pagination-btn"
+            (click)="previousPage()"
+            [disabled]="currentPage === 1"
+          >
+            ← Previous
+          </button>
+
+          <span class="pagination-info">
+            Page {{ currentPage }} of {{ totalPages }}
+          </span>
+
+          <button
+            type="button"
+            class="pagination-btn"
+            (click)="nextPage()"
+            [disabled]="currentPage === totalPages"
+          >
+            Next →
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- =====================================================
+     ADD / EDIT PRODUCT MODAL
+===================================================== -->
+
+@if (showProductModal) {
+  <div class="modal-overlay" (click)="closeProductModal()">
+    <div class="product-modal" (click)="$event.stopPropagation()">
+      <!-- MODAL HEADER -->
+
+      <div class="modal-header">
+        <div>
+          <span class="modal-eyebrow">
+            {{ editingId !== null ? "EDIT PRODUCT" : "NEW PRODUCT" }}
+          </span>
+
+          <h2>
+            {{ editingId !== null ? "Edit Product" : "Add Product" }}
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          class="close-btn"
+          (click)="closeProductModal()"
+          [disabled]="saving"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- MODAL BODY -->
+
+      <div class="modal-body">
+        <!-- PRODUCT NAME -->
+
+        <div class="form-group">
+          <label for="productName"> Product Name </label>
+
+          <input
+            id="productName"
+            type="text"
+            placeholder="e.g. Classic Cheese Burger"
+            [(ngModel)]="productName"
+            maxlength="100"
+            [disabled]="saving"
+          />
+        </div>
+
+        <!-- DESCRIPTION -->
+
+        <div class="form-group">
+          <label for="productDescription"> Description </label>
+
+          <textarea
+            id="productDescription"
+            rows="3"
+            placeholder="Enter product description..."
+            [(ngModel)]="productDescription"
+            maxlength="500"
+            [disabled]="saving"
+          ></textarea>
+        </div>
+
+        <!-- PRICE + CATEGORY -->
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="productPrice"> Price </label>
+
+            <div class="price-input">
+              <span>₹</span>
+
+              <input
+                id="productPrice"
+                type="number"
+                min="1"
+                step="0.01"
+                placeholder="149"
+                [(ngModel)]="productPrice"
+                [disabled]="saving"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="productCategory"> Category </label>
+
+            <select
+              id="productCategory"
+              [(ngModel)]="productCategoryId"
+              [disabled]="saving || loadingCategories"
+            >
+              <option [ngValue]="null">
+                {{
+                  loadingCategories
+                    ? "Loading categories..."
+                    : "Select category"
+                }}
+              </option>
+
+              @for (category of categories; track category.id) {
+                <option [ngValue]="category.id">
+                  {{ category.name }}
+                </option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <!-- IMAGE URL -->
+
+        <div class="form-group">
+          <label for="productImage"> Product Image </label>
+
+          <input
+            id="productImage"
+            type="file"
+            accept=".jpg,.jpeg,.png,.webp"
+            (change)="onImageSelected($event)"
+            [disabled]="saving || uploadingImage"
+          />
+
+          <small> JPG, JPEG, PNG or WEBP — maximum 5 MB. </small>
+
+          <div class="image-upload-status" *ngIf="uploadingImage">
+            Uploading image...
+          </div>
+
+          <div class="image-preview" *ngIf="productImageUrl">
+            <img [src]="productImageUrl" alt="Product preview" />
+          </div>
+        </div>
+
+        <!-- AVAILABILITY -->
+
+        <!-- AVAILABILITY -->
+        <div class="availability-row">
+          <label class="switch-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="productIsAvailable"
+              [disabled]="saving"
+            />
+
+            <span class="switch"></span>
+
+            <span>Product Available</span>
+          </label>
+        </div>
+
+        <!-- FOOD TYPE -->
+        <div class="food-type-row">
+          <label class="food-type-label">Food Type</label>
+
+          <div class="food-type-options">
+            <label class="food-type-option">
+              <input
+                type="radio"
+                name="foodType"
+                [value]="true"
+                [(ngModel)]="productIsVeg"
+                [disabled]="saving"
+              />
+              <span>🟢 Veg</span>
+            </label>
+
+            <label class="food-type-option">
+              <input
+                type="radio"
+                name="foodType"
+                [value]="false"
+                [(ngModel)]="productIsVeg"
+                [disabled]="saving"
+              />
+              <span>🔴 Non-Veg</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODAL FOOTER -->
+
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="cancel-btn"
+          (click)="closeProductModal()"
+          [disabled]="saving"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="save-btn"
+          (click)="saveProduct()"
+          [disabled]="saving"
+        >
+          @if (saving) {
+            Saving...
+          } @else {
+            {{ editingId !== null ? "Update Product" : "Save Product" }}
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- =====================================================
+     DELETE CONFIRMATION MODAL
+===================================================== -->
+
+@if (showDeleteModal && deleteProduct) {
+  <div class="modal-overlay" (click)="closeDeleteModal()">
+    <div class="delete-modal" (click)="$event.stopPropagation()">
+      <div class="delete-icon">🗑️</div>
+
+      <h2>Delete Product?</h2>
+
+      <p>
+        Are you sure you want to delete
+        <strong> {{ deleteProduct.name }} </strong>?
+      </p>
+
+      <span class="delete-warning"> This action cannot be undone. </span>
+
+      <div class="delete-actions">
+        <button
+          type="button"
+          class="cancel-btn"
+          (click)="closeDeleteModal()"
+          [disabled]="deleting"
+        >
+          Cancel
+        </button>
+
+        <button
+          type="button"
+          class="confirm-delete-btn"
+          (click)="confirmDelete()"
+          [disabled]="deleting"
+        >
+          @if (deleting) {
+            Deleting...
+          } @else {
+            Delete Product
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

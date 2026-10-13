@@ -1,0 +1,234 @@
+<div class="inventory-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <div class="breadcrumb">
+        <span>Admin</span>
+        <span class="separator">›</span>
+        <span>Inventory</span>
+      </div>
+
+      <h1>Inventory</h1>
+      <p>Manage product stock and inventory levels</p>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading" *ngIf="loading">Loading inventory...</div>
+
+  <!-- Error -->
+  <div class="error-message" *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+  <div class="success-message" *ngIf="successMessage">
+    {{ successMessage }}
+  </div>
+
+  <ng-container *ngIf="!loading && !errorMessage">
+    <!-- Statistics -->
+    <div class="inventory-stats">
+      <div class="stat-card">
+        <div class="stat-label">Total Products</div>
+        <div class="stat-value">{{ totalProducts }}</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">In Stock</div>
+        <div class="stat-value">{{ inStockCount }}</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Low Stock</div>
+        <div class="stat-value">{{ lowStockCount }}</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-label">Out of Stock</div>
+        <div class="stat-value">{{ outOfStockCount }}</div>
+      </div>
+    </div>
+
+    <!-- Inventory Table -->
+    <div class="inventory-card">
+      <div class="table-header">
+        <div>
+          <h2>Product Inventory</h2>
+          <p>Monitor and update product stock</p>
+        </div>
+
+        <!-- Search & Filter -->
+        <div class="inventory-filters">
+          <input
+            type="text"
+            placeholder="Search product..."
+           [(ngModel)]="selectedSearch"
+          />
+
+          <select [(ngModel)]="statusFilter">
+            <option value="All">All Status</option>
+            <option value="In Stock">In Stock</option>
+            <option value="Low Stock">Low Stock</option>
+            <option value="Out of Stock">Out of Stock</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Threshold</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let product of paginatedProducts">
+              <td>
+                {{ product.name }}
+              </td>
+
+              <td>₹{{ product.price }}</td>
+
+              <td>
+                {{ product.stockQuantity }}
+              </td>
+
+              <td>
+                {{ product.lowStockThreshold }}
+              </td>
+
+              <td>
+                <span
+                  class="status"
+                  [class.in-stock]="product.stockStatus === 'In Stock'"
+                  [class.low-stock]="product.stockStatus === 'Low Stock'"
+                  [class.out-of-stock]="product.stockStatus === 'Out of Stock'"
+                >
+                  {{ product.stockStatus }}
+                </span>
+              </td>
+
+              <td>
+                <button
+                  class="update-btn"
+                  type="button"
+                  (click)="openStockModal(product)"
+                >
+                  Update Stock
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="filteredProducts.length === 0">
+              <td colspan="6" class="empty-state">No products found.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="filteredProducts.length > 0">
+          <button
+            type="button"
+            (click)="previousPage()"
+            [disabled]="currentPage === 1"
+          >
+            Previous
+          </button>
+
+          <span> Page {{ currentPage }} of {{ totalPages }} </span>
+
+          <button
+            type="button"
+            (click)="nextPage()"
+            [disabled]="currentPage === totalPages"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<!-- ========================================= -->
+<!-- UPDATE STOCK MODAL -->
+<!-- ========================================= -->
+
+<div class="modal-backdrop" *ngIf="showStockModal" (click)="closeStockModal()">
+  <div class="stock-modal" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div>
+        <h2>Update Stock</h2>
+
+        <p *ngIf="selectedProduct">
+          {{ selectedProduct.name }}
+        </p>
+      </div>
+
+      <button
+        type="button"
+        class="close-btn"
+        (click)="closeStockModal()"
+        [disabled]="savingStock"
+      >
+        ×
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <!-- Stock Quantity -->
+      <div class="form-group">
+        <label for="stockQuantity"> Stock Quantity </label>
+
+        <input
+          id="stockQuantity"
+          type="number"
+          min="0"
+          [(ngModel)]="stockQuantity"
+          [disabled]="savingStock"
+        />
+      </div>
+
+      <!-- Low Stock Threshold -->
+      <div class="form-group">
+        <label for="lowStockThreshold"> Low Stock Threshold </label>
+
+        <input
+          id="lowStockThreshold"
+          type="number"
+          min="0"
+          [(ngModel)]="lowStockThreshold"
+          [disabled]="savingStock"
+        />
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="modal-footer">
+      <button
+        type="button"
+        class="cancel-btn"
+        (click)="closeStockModal()"
+        [disabled]="savingStock"
+      >
+        Cancel
+      </button>
+
+      <button
+        type="button"
+        class="save-btn"
+        (click)="saveStock()"
+        [disabled]="savingStock"
+      >
+        {{ savingStock ? "Updating..." : "Update Stock" }}
+      </button>
+    </div>
+  </div>
+</div>

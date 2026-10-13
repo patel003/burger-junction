@@ -1,0 +1,242 @@
+<div class="rp">
+
+  <!-- ========================= -->
+  <!-- TODAY + DUTY -->
+  <!-- ========================= -->
+
+  <header class="top">
+    <div>
+      <span class="top-label">Today</span>
+      <strong class="top-amount">₹{{ todayEarnings }}</strong>
+      <span class="top-sub">
+        {{ todayDeliveries }} deliveries · ₹{{ todayCashCollected }} cash
+      </span>
+    </div>
+
+    <button
+      type="button"
+      class="duty"
+      [class.on]="isOnline"
+      [disabled]="availabilityLoading"
+      [attr.aria-pressed]="isOnline"
+      title="Tap to change duty status"
+      (click)="toggleOnline()"
+    >
+      <span class="duty-dot"></span>
+      {{ availabilityLoading ? "Updating..." : isOnline ? "On duty" : "Off duty" }}
+    </button>
+  </header>
+
+  <!-- ========================= -->
+  <!-- BANNERS -->
+  <!-- ========================= -->
+
+  @if (locationError) {
+    <div class="banner warn" role="alert">{{ locationError }}</div>
+  }
+
+  @if (isSharingLocation) {
+    <div class="banner live">
+      <span class="pulse"></span>
+      Live location is on
+      @for (id of outForDeliveryIds; track id) {
+        <b>#{{ id }}</b>
+      }
+    </div>
+  }
+
+  @if (errorMessage) {
+    <div class="banner warn" role="alert">{{ errorMessage }}</div>
+  }
+
+  <!-- ========================= -->
+  <!-- CURRENT DELIVERY -->
+  <!-- ========================= -->
+
+  @if (focusedOrder; as order) {
+    <app-rider-map
+      [destLat]="order.deliveryLatitude"
+      [destLng]="order.deliveryLongitude"
+      [showRoute]="order.status.toLowerCase() === 'out for delivery'"
+    />
+
+    <section class="focus">
+
+      <div class="focus-tag">CURRENT DELIVERY · #{{ order.id }}</div>
+
+      <div class="who">
+        <div class="who-text">
+          <h2>{{ order.customerName }}</h2>
+          <p class="addr">{{ order.deliveryAddress }}</p>
+        </div>
+
+        <a
+          class="call"
+          [href]="'tel:' + order.customerPhone"
+          aria-label="Call customer"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z" />
+          </svg>
+        </a>
+      </div>
+
+      <!-- Progress -->
+      <div class="steps" aria-label="Delivery progress">
+        @for (label of stepLabels; track label; let i = $index) {
+          <div class="step" [class.done]="i <= stepIndex(order)">
+            <span class="bar"></span>
+            {{ label }}
+          </div>
+        }
+      </div>
+
+      <!-- Payment -->
+      @if (order.cashDue > 0) {
+        <div class="cash">
+          <span>
+            Collect cash · {{ order.items.length }}
+            {{ order.items.length === 1 ? "item" : "items" }}
+          </span>
+          <strong>₹{{ order.cashDue }}</strong>
+        </div>
+      } @else {
+        <div class="cash paid">
+          <span>
+            Prepaid · {{ order.items.length }}
+            {{ order.items.length === 1 ? "item" : "items" }}
+          </span>
+          <strong>No cash</strong>
+        </div>
+      }
+
+      <details class="items">
+        <summary>View order items</summary>
+
+        @for (item of order.items; track item.productId) {
+          <div class="item-row">
+            <span>{{ item.productName }} × {{ item.quantity }}</span>
+            <strong>₹{{ item.price * item.quantity }}</strong>
+          </div>
+        }
+      </details>
+
+      <!-- Actions -->
+      @if (order.status.toLowerCase() === "ready for pickup") {
+        <button
+          type="button"
+          class="cta"
+          [disabled]="actionLoading"
+          (click)="pickupOrder(order)"
+        >
+          {{ actionLoading ? "Updating..." : "Picked up" }}
+        </button>
+
+        <button
+          type="button"
+          class="ghost"
+          (click)="openInMaps(order)"
+        >
+          Navigate
+        </button>
+      }
+
+      @if (order.status.toLowerCase() === "out for delivery") {
+        <label class="otp-label" for="delivery-otp">
+          Customer's 6-digit OTP
+        </label>
+
+        <input
+          id="delivery-otp"
+          class="otp"
+          type="text"
+          inputmode="numeric"
+          maxlength="6"
+          autocomplete="one-time-code"
+          placeholder="000000"
+          [value]="otpValue"
+          (input)="onOtpInput($event)"
+        />
+
+        <button
+          type="button"
+          class="cta"
+          [disabled]="actionLoading || !canDeliver"
+          (click)="deliverOrder(order)"
+        >
+          {{ actionLoading ? "Updating..." : "Delivered" }}
+        </button>
+
+        <div class="row">
+          <button
+            type="button"
+            class="ghost green"
+            [disabled]="otpLoading"
+            (click)="generateDeliveryOtp(order.id)"
+          >
+            {{ otpLoading ? "Sending..." : "Generate OTP" }}
+          </button>
+
+          <button
+            type="button"
+            class="ghost"
+            (click)="openInMaps(order)"
+          >
+            Navigate
+          </button>
+        </div>
+
+        @if (otpMessage) {
+          <p class="note">{{ otpMessage }}</p>
+        }
+      }
+
+    </section>
+
+    <!-- ========================= -->
+    <!-- NEXT UP -->
+    <!-- ========================= -->
+
+    <section class="next">
+      <h3>Next up</h3>
+
+      @for (other of otherOrders; track other.id) {
+        <button type="button" class="next-row" (click)="focusOrder(other.id)">
+          <span>
+            <b>#{{ other.id }} · {{ other.customerName }}</b>
+            <small>{{ other.status }}</small>
+          </span>
+          <span class="arrow" aria-hidden="true">›</span>
+        </button>
+      } @empty {
+        <div class="next-empty">No more orders yet. Stay nearby.</div>
+      }
+    </section>
+  } @else {
+
+    @if (ordersLoading) {
+      <div class="skeleton"></div>
+    } @else {
+      <div class="empty">
+        <div class="empty-art" [class.waiting]="isOnline">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="6" cy="17" r="3" /><circle cx="18" cy="17" r="3" />
+            <path d="M9 17h6M6 14l3-6h4l2 4M13 8h3" />
+          </svg>
+        </div>
+
+        <h3>{{ isOnline ? "Waiting for orders..." : "You're off duty" }}</h3>
+
+        <p>
+          {{
+            isOnline
+              ? "Stay nearby. Your next delivery will show up here."
+              : "Tap Off duty above to go on duty and get deliveries."
+          }}
+        </p>
+      </div>
+    }
+
+  }
+
+</div>

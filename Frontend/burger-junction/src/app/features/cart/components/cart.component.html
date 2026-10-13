@@ -1,0 +1,154 @@
+<section class="cart-page">
+  <div class="cart-container">
+
+    <!-- =========================
+         HEADER
+    ========================== -->
+    <div class="cart-header">
+      <h1>Your cart 🛒</h1>
+      <a routerLink="/menu" class="continue-shopping">← Continue shopping</a>
+    </div>
+
+    <!-- =========================
+         EMPTY CART
+    ========================== -->
+    <div class="empty-cart" *ngIf="cartItems.length === 0">
+      <div class="empty-icon">🛒</div>
+      <h2>Your cart is empty</h2>
+      <p>Add some delicious food from our menu and come back here.</p>
+      <a routerLink="/menu" class="browse-btn">Browse menu →</a>
+    </div>
+
+    <!-- =========================
+         CART CONTENT
+    ========================== -->
+    <div class="cart-grid" *ngIf="cartItems.length > 0">
+
+      <!-- ITEMS -->
+      <div class="cart-items-card">
+
+        <div class="card-header">
+          <h2>
+            {{ getItemCount() }}
+            {{ getItemCount() === 1 ? "item" : "items" }}
+          </h2>
+        </div>
+
+        <div class="alert" *ngIf="hasUnavailableItems()">
+          Some items are unavailable right now. Remove them to continue to checkout.
+        </div>
+
+        <div class="cart-item" *ngFor="let item of cartItems">
+
+          <div class="item-image">
+            <div class="item-placeholder">🍔</div>
+            <img
+              *ngIf="item.product.imageUrl"
+              [src]="item.product.imageUrl"
+              [alt]="item.product.name"
+              (error)="$any($event.target).style.display = 'none'"
+            />
+          </div>
+
+          <div class="item-details">
+            <h3>{{ item.product.name }}</h3>
+
+            <p class="item-price">{{ formatPrice(item.product.price) }} each</p>
+
+            @if (!item.product.isAvailable || item.product.stockQuantity <= 0) {
+              <span class="stock-status unavailable">Currently unavailable</span>
+            } @else if (item.quantity >= item.product.stockQuantity) {
+              <span class="stock-status limit">Maximum quantity reached</span>
+            } @else if (item.product.stockQuantity <= item.product.lowStockThreshold) {
+              <span class="stock-status low-stock">Only {{ item.product.stockQuantity }} left</span>
+            }
+
+            <div class="item-actions">
+              <div class="quantity-control">
+                <button
+                  type="button"
+                  aria-label="Decrease quantity"
+                  (click)="decreaseQuantity(item)"
+                >
+                  −
+                </button>
+
+                <span>{{ item.quantity }}</span>
+
+                <button
+                  type="button"
+                  aria-label="Increase quantity"
+                  (click)="increaseQuantity(item)"
+                  [disabled]="!canIncrease(item)"
+                >
+                  +
+                </button>
+              </div>
+
+              <button type="button" class="remove-btn" (click)="removeItem(item.product.id)">
+                Remove
+              </button>
+            </div>
+          </div>
+
+          <strong class="item-total">
+            {{ formatPrice(item.product.price * item.quantity) }}
+          </strong>
+
+        </div>
+      </div>
+
+      <!-- SUMMARY -->
+      <aside class="summary-card">
+        <h2>Order summary</h2>
+
+        <div class="summary-row">
+          <span>Items</span>
+          <strong>{{ getItemCount() }}</strong>
+        </div>
+
+        <div class="summary-row">
+          <span>Subtotal</span>
+          <strong>{{ formatPrice(getSubtotal()) }}</strong>
+        </div>
+
+        <div class="summary-total">
+          <span>Total</span>
+          <strong>{{ formatPrice(getSubtotal()) }}</strong>
+        </div>
+
+        <p class="summary-hint">Coupons can be applied at checkout.</p>
+
+        <button
+          type="button"
+          class="checkout-btn"
+          (click)="proceedToCheckout()"
+          [disabled]="hasUnavailableItems()"
+        >
+          Checkout →
+        </button>
+
+        <a routerLink="/menu" class="back-menu">Add more items</a>
+      </aside>
+    </div>
+
+    <!-- =========================
+         MOBILE CHECKOUT BAR
+    ========================== -->
+    <div class="mobile-checkout" *ngIf="cartItems.length > 0">
+      <div>
+        <small>Total</small>
+        <strong>{{ formatPrice(getSubtotal()) }}</strong>
+      </div>
+
+      <button
+        type="button"
+        (click)="proceedToCheckout()"
+        [disabled]="hasUnavailableItems()"
+      >
+        Checkout →
+      </button>
+    </div>
+
+  </div>
+</section>
